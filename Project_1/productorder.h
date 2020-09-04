@@ -57,13 +57,13 @@ public:
 	ProductOrder& operator++();
 
 	// Post-increment operator overload
-	ProductOrder& operator++(int);
+	ProductOrder operator++(int);
 
 	// Pre-decrement operator overload
 	ProductOrder& operator--();
 
 	// Post-decrement operator overload
-	ProductOrder& operator--(int);
+	ProductOrder operator--(int);
 
 
 private: // Data Members

@@ -4,6 +4,8 @@
 // Source file for class ProductOrder
 
 #include "productorder.h"
+#include <string>
+#include <sstream>
 
 // Default Constructor
 ProductOrder::ProductOrder()
@@ -98,13 +100,14 @@ std::string ProductOrder::toString() const
 ProductOrder& ProductOrder::operator++()
 {
 	quantity_++;
+	return *this;
 }
 
 // Post-increment operator overload
 // Increases quantity_ by 1
-ProductOrder& ProductOrder::operator++(int)
+ProductOrder ProductOrder::operator++(int)
 {
-	++*this;
+	return ++*this;
 }
 
 // Pre-decrement operator overload
@@ -116,14 +119,15 @@ ProductOrder& ProductOrder::operator--()
 	{
 		quantity_--;
 	}
+	return *this;
 }
 
 // Post-decrement operator overload
 // Decreases quantity_ by 1
 // Does nothing if quantity is 0
-ProductOrder& ProductOrder::operator--(int)
+ProductOrder ProductOrder::operator--(int)
 {
-	--*this;
+	return --*this;
 }
 
 // Comparison operator, returns true if both product_ and quantity_ are equal
