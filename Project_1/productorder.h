@@ -9,7 +9,7 @@
 #include<string>
 
 // A Product Order holds the name and quantity of a product being ordered
-// Invariants: quantity_ > 0
+// Invariants: quantity_ >= 0
 class ProductOrder
 {
 public:
@@ -18,19 +18,19 @@ public:
 	ProductOrder();
 
 	// Copy Constructor
-	ProductOrder(const ProductOrder& other);
+	ProductOrder(const ProductOrder& other) = default;
 
 	// Move Constructor
-	ProductOrder(ProductOrder&& other);
+	ProductOrder(ProductOrder&& other) = default;
 
 	// Copy Assignment Operator
-	ProductOrder& operator=(const ProductOrder& other);
+	ProductOrder& operator=(const ProductOrder& other) = default;
 
 	// Move Assignment Operator
-	ProductOrder& operator=(ProductOrder&& other);
+	ProductOrder& operator=(ProductOrder&& other) = default;
 
 	// Destructor
-	~ProductOrder();
+	~ProductOrder() = default;
 
 	// Two parameter constructor. Takes a product name as a string and a quantity as an int
 	ProductOrder(std::string product, int quantity);
