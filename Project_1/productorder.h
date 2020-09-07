@@ -9,7 +9,6 @@
 #include<string>
 
 // A ProductOrder holds the name and quantity of a product being ordered
-// See source file for more detailed comments on functions, including preconditions
 // Invariants: quantity_ >= 0
 class ProductOrder
 {

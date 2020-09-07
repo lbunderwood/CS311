@@ -5,7 +5,7 @@
 
 #include "productorder.h"
 #include <string>
-#include <sstream>
+#include <ostream>
 
 // Default Constructor
 ProductOrder::ProductOrder()
