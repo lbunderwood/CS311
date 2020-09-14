@@ -21,7 +21,7 @@ public:
 	// Default Constructor
 	MSArray()
 	{
-
+		this->MSArray(8);
 	}
 
 	////////////////////////////////////////////////
@@ -31,25 +31,31 @@ public:
 	// Copy Constructor
 	MSArray(const MSArray& old)
 	{
-
+		std::copy(old.begin(), old.end(), this->begin());
 	}
 
 	// Move Constructor
 	MSArray(MSArray&& old)
 	{
-
+		mswap(*this, old);
 	}
 
 	// Copy Assignment Operator
 	MSArray operator=(const MSArray& old)
 	{
-
+		std::copy(old.begin(), old.end(), this->begin());
 	}
 
 	// Move Assignment Operator
 	MSArray operator=(MSArray&& old)
 	{
+		mswap(*this, old);
+	}
 
+	// Destructor
+	~MSArray()
+	{
+		delete[] array_;
 	}
 
 	////////////////////////////////////
@@ -60,14 +66,16 @@ public:
 	// Pre : size >= 0
 	MSArray(size_t size)
 	{
-
+		T* temp[size];
+		array_ = temp;
 	}
 
 	// two-parameter constructor - sets desired array size and an item to fill it with
 	// Pre : size >= 0
 	MSArray(size_t size, T item)
 	{
-
+		T* temp[size] = { item };
+		array_ = temp;
 	}
 
 	///////////////////////////////
@@ -78,14 +86,14 @@ public:
 	// Pre : index < this->size()
 	T& operator[](size_t index)
 	{
-
+		return &array_[index];
 	}
 
 	// const bracket operator - returns the element stored at the given index, but not modifyable
 	// Pre : index < this->size()
 	const T& operator[](size_t index) const
 	{
-
+		return &array_[index];
 	}
 
 	/////////////////////////////
@@ -96,7 +104,7 @@ public:
 	// Pre : none
 	size_t size()
 	{
-
+		return size_;
 	}
 
 	// begin iterator - returns a pointer to the first element in the array
@@ -141,7 +149,7 @@ private:
 	// Pre : none
 	void mswap(MSArray& other)
 	{
-		std::swap(this->arr, other.arr);
+		std::swap(this->array_, other.array_);
 	}
 
 	//////////////////////////////
@@ -149,7 +157,10 @@ private:
 	//////////////////////////////
 
 	//The actual array
-	T arr[];
+	T* array_;
+
+	// keeps track of the size
+	size_t size_;
 };
 
 ///////////////////////////////
