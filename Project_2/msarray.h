@@ -20,41 +20,37 @@ class MSArray
 public:
 
 	// Default Constructor
-	MSArray()
-	{
-		this->MSArray::MSArray(8);
-	}
+	MSArray() 
+		: MSArray(8) {}
 
 	////////////////////////////////////////////////
 	// Big Five Constructors - defined explicitly //
 	////////////////////////////////////////////////
 
 	// Copy Constructor
-	MSArray(const MSArray& old)
+	MSArray(const MSArray& old) : MSArray(old.size())
 	{
-		this->MSArray::MSArray(old.size());
 		std::copy(old.begin(), old.end(), this->begin());
 	}
 
 	// Move Constructor
-	MSArray(MSArray&& old) noexcept
+	MSArray(MSArray&& old) noexcept : array_(old.array_), size_(old.size())
 	{
-		this->MSArray::MSArray(old.size());
-		mswap(old);
+		old.array_ = nullptr;
+		old.size_ = 0;
 	}
 
 	// Copy Assignment Operator
 	MSArray& operator=(const MSArray& old)
 	{
-		this->MSArray::MSArray(old.size());
-		std::copy(old.begin(), old.end(), this->begin());
+		MSArray copy(old);
+		mswap(copy);
 		return *this;
 	}
 
 	// Move Assignment Operator
 	MSArray& operator=(MSArray&& old) noexcept
 	{
-		this->MSArray::MSArray(old.size());
 		mswap(old);
 		return *this;
 	}
@@ -71,18 +67,13 @@ public:
 
 	// single-parameter constructor - sets desired array size
 	// Pre : size >= 0
-	MSArray(size_t size)
-	{
-		T* temp = new T[size];
-		array_ = temp;
-		size_ = size;
-	}
+	MSArray(size_t size) 
+		: size_(size), array_(new T[size]) {}
 
 	// two-parameter constructor - sets desired array size and an item to fill it with
 	// Pre : size >= 0
-	MSArray(size_t size, T item)
+	MSArray(size_t size, T item) : MSArray(size)
 	{
-		this->MSArray::MSArray(size);
 		for (auto& m : *this)
 		{
 			m = item;
@@ -161,6 +152,7 @@ private:
 	void mswap(MSArray& other)
 	{
 		std::swap(this->array_, other.array_);
+		std::swap(this->size_, other.size_);
 	}
 
 	//////////////////////////////
@@ -211,7 +203,7 @@ bool operator<(const MSArray<T>& left, const MSArray<T>& right)
 template <typename T>
 bool operator<=(const MSArray<T>& left, const MSArray<T>& right)
 {
-	return left < right || left == right;
+	return !(right < left);
 }
 
 // Strictly greater than comparison operator - returns true if the left array has values that are greater, lexicographically
@@ -220,7 +212,7 @@ bool operator<=(const MSArray<T>& left, const MSArray<T>& right)
 template <typename T>
 bool operator>(const MSArray<T>& left, const MSArray<T>& right)
 {
-	return !(left <= right);
+	return right < left;
 }
 
 // Greater than or equal to comparison operator - returns true if the left array has values that are greater, lexicographically, or equal
@@ -229,7 +221,7 @@ bool operator>(const MSArray<T>& left, const MSArray<T>& right)
 template <typename T>
 bool operator>=(const MSArray<T>& left, const MSArray<T>& right)
 {
-	return left > right || left == right;
+	return !(left < right);
 }
 
 #endif // MSARRAY_H
