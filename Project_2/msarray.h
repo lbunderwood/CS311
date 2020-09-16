@@ -12,12 +12,16 @@
 
 // Template Class MSArray (moderately smart array)
 // A class meant to weakly imitate std::vector
-// Invariants : 
-// Template Type Restrictions : 
+// Invariants : size_ >= 0
+// Template Type Restrictions : T must have a default constructor
 template <typename T>
 class MSArray
 {
 public:
+
+	// define some types to help keep things straight
+	using size_type = std::size_t;
+	using value_type = T;
 
 	// Default Constructor
 	MSArray() 
@@ -67,12 +71,13 @@ public:
 
 	// single-parameter constructor - sets desired array size
 	// Pre : size >= 0
-	MSArray(size_t size) 
-		: size_(size), array_(new T[size]) {}
+	MSArray(size_type size)
+		: size_(size), array_(new value_type[size]) {}
 
 	// two-parameter constructor - sets desired array size and an item to fill it with
-	// Pre : size >= 0
-	MSArray(size_t size, T item) : MSArray(size)
+	// Pre : size >= 0, item must be of the same type as given in the <> operators (MSArray<int> arr(1, "hello") is not allowed)
+	MSArray(size_type size, value_type item)
+		: MSArray(size)
 	{
 		for (auto& m : *this)
 		{
@@ -85,15 +90,15 @@ public:
 	///////////////////////////////
 
 	// bracket operator - returns the element stored at the given index
-	// Pre : index < this->size()
-	T& operator[](size_t index)
+	// Pre : 0 <= index < this->size() - 1
+	value_type& operator[](size_type index)
 	{
 		return array_[index];
 	}
 
 	// const bracket operator - returns the element stored at the given index, but not modifyable
-	// Pre : index < this->size()
-	const T& operator[](size_t index) const
+	// Pre : 0 <= index < this->size() - 1
+	const value_type& operator[](size_type index) const
 	{
 		return array_[index];
 	}
@@ -104,42 +109,38 @@ public:
 
 	// size function - returns the number of elements in the array
 	// Pre : none
-	size_t size() const
+	size_type size() const
 	{
 		return size_;
 	}
 
 	// begin iterator - returns a pointer to the first element in the array
 	// Pre : none
-	T* begin()
+	value_type* begin()
 	{
 		return array_;
 	}
 
 	// const begin iterator - returns a const pointer to the first element in the array
 	// Pre : none
-	const T* begin() const
+	const value_type* begin() const
 	{
 		return array_;
 	}
 
 	// end iterator - returns a pointer to just past the end of the array
 	// Pre : none
-	T* end()
+	value_type* end()
 	{
 		return begin() + size();
 	}
 	
 	// const end iterator - returns a const pointer to just past the end of the array
 	// Pre : none
-	const T* end() const
+	const value_type* end() const
 	{
 		return begin() + size();
 	}
-
-	// define some types that really don't make anything any less opaque
-	using size_type = size_t;
-	using value_type = T;
 
 private:
 
@@ -159,11 +160,11 @@ private:
 	// Private Member Variables //
 	//////////////////////////////
 
-	//The actual array
-	T* array_;
+	// The actual array
+	value_type* array_;
 
 	// keeps track of the size
-	size_t size_;
+	size_type size_;
 };
 
 ///////////////////////////////
@@ -172,7 +173,7 @@ private:
 
 // Equality comparison operator - returns true if every element is identical, false otherwise
 // Pre : none
-// Template Type Restrictions : 
+// Template Type Restrictions : T must have == operator
 template <typename T>
 bool operator==(const MSArray<T>& left, const MSArray<T>& right)
 {
@@ -181,7 +182,7 @@ bool operator==(const MSArray<T>& left, const MSArray<T>& right)
 
 // Inequality comparison operator - returns false if every element is identical, true otherwise
 // Pre : none
-// Template Type Restrictions : 
+// Template Type Restrictions : T must have == operator
 template <typename T>
 bool operator!=(const MSArray<T>& left, const MSArray<T>& right)
 {
@@ -190,7 +191,7 @@ bool operator!=(const MSArray<T>& left, const MSArray<T>& right)
 
 // Strictly less than comparison operator - returns true if the left array has values that are smaller, lexicographically
 // Pre : none
-// Template Type Restrictions : 
+// Template Type Restrictions : T must have < operator
 template <typename T>
 bool operator<(const MSArray<T>& left, const MSArray<T>& right)
 {
@@ -199,7 +200,7 @@ bool operator<(const MSArray<T>& left, const MSArray<T>& right)
 
 // Less than or equal to comparison operator - returns true if the left array has values that are smaller, lexicographically, or equal
 // Pre : none
-// Template Type Restrictions : 
+// Template Type Restrictions : T must have < operator
 template <typename T>
 bool operator<=(const MSArray<T>& left, const MSArray<T>& right)
 {
@@ -208,7 +209,7 @@ bool operator<=(const MSArray<T>& left, const MSArray<T>& right)
 
 // Strictly greater than comparison operator - returns true if the left array has values that are greater, lexicographically
 // Pre : none
-// Template Type Restrictions : 
+// Template Type Restrictions : T must have < operator
 template <typename T>
 bool operator>(const MSArray<T>& left, const MSArray<T>& right)
 {
@@ -217,7 +218,7 @@ bool operator>(const MSArray<T>& left, const MSArray<T>& right)
 
 // Greater than or equal to comparison operator - returns true if the left array has values that are greater, lexicographically, or equal
 // Pre : none
-// Template Type Restrictions : 
+// Template Type Restrictions : T must have < operator
 template <typename T>
 bool operator>=(const MSArray<T>& left, const MSArray<T>& right)
 {
