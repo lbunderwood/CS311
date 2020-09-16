@@ -8,6 +8,7 @@
 #define MSARRAY_H
 
 #include<utility>
+#include<algorithm>
 
 // Template Class MSArray (moderately smart array)
 // A class meant to weakly imitate std::vector
@@ -146,7 +147,7 @@ public:
 	}
 
 	// define some types that really don't make anything any less opaque
-	typedef size_t size_type;
+	using size_type = size_t;
 	using value_type = T;
 
 private:
