@@ -21,7 +21,7 @@ public:
 	// Default Constructor
 	MSArray()
 	{
-		this->MSArray(8);
+		this->MSArray::MSArray(8);
 	}
 
 	////////////////////////////////////////////////
@@ -31,25 +31,31 @@ public:
 	// Copy Constructor
 	MSArray(const MSArray& old)
 	{
+		this->MSArray::MSArray(old.size());
 		std::copy(old.begin(), old.end(), this->begin());
 	}
 
 	// Move Constructor
-	MSArray(MSArray&& old)
+	MSArray(MSArray&& old) noexcept
 	{
-		mswap(*this, old);
+		this->MSArray::MSArray(old.size());
+		mswap(old);
 	}
 
 	// Copy Assignment Operator
-	MSArray operator=(const MSArray& old)
+	MSArray& operator=(const MSArray& old)
 	{
+		this->MSArray::MSArray(old.size());
 		std::copy(old.begin(), old.end(), this->begin());
+		return *this;
 	}
 
 	// Move Assignment Operator
-	MSArray operator=(MSArray&& old)
+	MSArray& operator=(MSArray&& old) noexcept
 	{
-		mswap(*this, old);
+		this->MSArray::MSArray(old.size());
+		mswap(old);
+		return *this;
 	}
 
 	// Destructor
@@ -66,16 +72,20 @@ public:
 	// Pre : size >= 0
 	MSArray(size_t size)
 	{
-		T* temp[size];
+		T* temp = new T[size];
 		array_ = temp;
+		size_ = size;
 	}
 
 	// two-parameter constructor - sets desired array size and an item to fill it with
 	// Pre : size >= 0
 	MSArray(size_t size, T item)
 	{
-		T* temp[size] = { item };
-		array_ = temp;
+		this->MSArray::MSArray(size);
+		for (auto& m : *this)
+		{
+			m = item;
+		}
 	}
 
 	///////////////////////////////
@@ -86,14 +96,14 @@ public:
 	// Pre : index < this->size()
 	T& operator[](size_t index)
 	{
-		return &array_[index];
+		return array_[index];
 	}
 
 	// const bracket operator - returns the element stored at the given index, but not modifyable
 	// Pre : index < this->size()
 	const T& operator[](size_t index) const
 	{
-		return &array_[index];
+		return array_[index];
 	}
 
 	/////////////////////////////
@@ -102,7 +112,7 @@ public:
 
 	// size function - returns the number of elements in the array
 	// Pre : none
-	size_t size()
+	size_t size() const
 	{
 		return size_;
 	}
@@ -111,28 +121,28 @@ public:
 	// Pre : none
 	T* begin()
 	{
-		return &array_[0]
+		return array_;
 	}
 
 	// const begin iterator - returns a const pointer to the first element in the array
 	// Pre : none
 	const T* begin() const
 	{
-		return &array_[0]
+		return array_;
 	}
 
 	// end iterator - returns a pointer to just past the end of the array
 	// Pre : none
 	T* end()
 	{
-		return ++(&array_[size_ - 1])
+		return begin() + size();
 	}
 	
 	// const end iterator - returns a const pointer to just past the end of the array
 	// Pre : none
 	const T* end() const
 	{
-		return ++(&array_[size_ - 1])
+		return begin() + size();
 	}
 
 	// define some types that really don't make anything any less opaque
@@ -173,19 +183,7 @@ private:
 template <typename T>
 bool operator==(const MSArray<T>& left, const MSArray<T>& right)
 {
-	//cycle through left
-	for (auto m : left)
-	{
-		//compare to corresponding element in right
-		if (m != right.begin() + (&m - left.begin()))
-		{
-			// if they arent equal, we have our answer
-			return false;
-		}
-	}
-
-	// if we made it all the way through, we return true
-	return true;
+	return std::equal(left.begin(), left.end(), right.begin(), right.end());
 }
 
 // Inequality comparison operator - returns false if every element is identical, true otherwise
@@ -194,7 +192,7 @@ bool operator==(const MSArray<T>& left, const MSArray<T>& right)
 template <typename T>
 bool operator!=(const MSArray<T>& left, const MSArray<T>& right)
 {
-	return !(left == right)
+	return !(left == right);
 }
 
 // Strictly less than comparison operator - returns true if the left array has values that are smaller, lexicographically
@@ -203,26 +201,7 @@ bool operator!=(const MSArray<T>& left, const MSArray<T>& right)
 template <typename T>
 bool operator<(const MSArray<T>& left, const MSArray<T>& right)
 {
-	// cycle through left
-	for (auto m : left)
-	{
-		// compare to corresponding element in right
-		if (m < right.begin() + (&m - left.begin()))
-		{
-			// if it's less than, we have an answer
-			return true;
-		}
-		else if (m > right.begin() + (&m - left.begin()))
-		{
-			// if it's greater than, we have an answer
-			return false;
-		}
-
-		// otherwise, try the next element
-	}
-
-	// if we made it all the way through, we return false
-	return false;
+	return std::lexicographical_compare(left.begin(), left.end(), right.begin(), right.end());
 }
 
 // Less than or equal to comparison operator - returns true if the left array has values that are smaller, lexicographically, or equal
