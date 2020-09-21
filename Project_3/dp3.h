@@ -21,10 +21,32 @@ template <typename ValueType>
 ValueType lookup(const LLNode<ValueType> * head,
                  std::size_t index)
 {
+    // check for negative input
+    if(index < 0)
+    {
+        throw std::out_of_range("lookup was called with bad parameters.\n"
+            "The specified index must not be negative.");
+    }
+
+    // check for end of list
+    if(head == nullptr)
+    {
+        throw std::out_of_range("lookup was called with bad parameters.\n"
+            "The given LLNode was empty.");
+    }
+
     // advance list until desired index is reached
     for(size_t i = 0; i < index; ++i)
     {
+        // advance
         head = head->_next;
+
+        // check for end of list
+        if(head == nullptr)
+        {
+            throw std::out_of_range("lookup was called with bad parameters.\n"
+                "The specified index does not exist in the given LLNode.");
+        }
     }
 
     // return data from that index
