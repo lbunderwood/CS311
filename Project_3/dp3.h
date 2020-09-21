@@ -21,8 +21,14 @@ template <typename ValueType>
 ValueType lookup(const LLNode<ValueType> * head,
                  std::size_t index)
 {
-    return ValueType();  // Dummy return
-    // TODO: Write this!!!
+    // advance list until desired index is reached
+    for(size_t i = 0; i < index; ++i)
+    {
+        head = head->_next;
+    }
+
+    // return data from that index
+    return head->_data;
 }
 
 
