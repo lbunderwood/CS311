@@ -6,6 +6,7 @@
 // Header for Project 3 functions
 
 /////////////////////////////////////
+
 // Edited and completed by Luke Underwood
 // 9/21/2020
 
@@ -17,6 +18,11 @@
 #include <functional>  // For std::function
 
 
+// lookup function for LLNode
+// takes head pointer for an LLNode, and an index
+// returns the term at the given index
+// Pre : list must not be empty (head != nullptr)
+//       0 <= index < size of list 
 template <typename ValueType>
 ValueType lookup(const LLNode<ValueType> * head,
                  std::size_t index)
@@ -54,36 +60,58 @@ ValueType lookup(const LLNode<ValueType> * head,
 }
 
 
-// Implementation in source file
+// didItThrow function for error handling
+// takes function pointer and bool
+// returns bool by parameter reference
+// returns true and re-throws exception if the given function throws an exception
+// returns false otherwise
+// Pre : function pointer must not take parameters and have return type void
 void didItThrow(const std::function<void()> & ff,
                 bool & threw);
 
 
+// checkSorted function for arrays
+// takes two iterators
+// returns bool by value
+// returns true if the array is in ascending order
+// returns false otherwise
+// Pre : first < last
+//       first and last must be forward iterators specifying a continuous range
 template <typename FDIter>
 bool checkSorted(FDIter first,
                  FDIter last)
 {
-
+    // create "next" iterator to compare with the current value
     auto next = first;
     ++next;
+
+    // first != last checks for empty arrays
+    // next != last checks for end of array
     while(first != last && next != last)
     {
+        // if something is out of order, return false
         if(*first > *next)
         {
             return false;
         }
 
+        // iterate to check next term
         ++first;
         ++next;
     }
+
+    // if we made it this far, the range is sorted
     return true;
 }
 
 
-// Implementation in source file
+// gcd function to find greatest common denominator
+// takes two integers
+// returns gcd of parameters by value
+// Pre : a != 0 || b != 0 (a and b cannot both be 0)
+//       a >= 0 && b >= 0 (a and b must both be positive)
 int gcd(int a,
         int b);
 
 
 #endif  //#ifndef FILE_DP3_H_INCLUDED
-
