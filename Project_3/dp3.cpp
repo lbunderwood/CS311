@@ -18,14 +18,33 @@ using std::function;
 void didItThrow(const function<void()> & ff,
                 bool & threw)
 {
-    // TODO: Write this!!!
+    try
+    {
+        ff();
+    }
+    catch(...)
+    {
+        threw = true;
+        throw;
+    }
+    threw = false;
 }
 
 
 int gcd(int a,
         int b)
 {
-    return 42;  // Dummy return
-    // TODO: Write this!!!
+    if(a == 0)
+    {
+        return b;
+    }
+    else if (a > b)
+    {
+        return gcd(b, a);
+    }
+    else
+    {
+        return gcd(b%a, a);
+    }
 }
 

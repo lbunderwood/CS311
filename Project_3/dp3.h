@@ -28,7 +28,7 @@ ValueType lookup(const LLNode<ValueType> * head,
             "The specified index must not be negative.");
     }
 
-    // check for end of list
+    // check for empty list
     if(head == nullptr)
     {
         throw std::out_of_range("lookup was called with bad parameters.\n"
@@ -63,8 +63,20 @@ template <typename FDIter>
 bool checkSorted(FDIter first,
                  FDIter last)
 {
-    return false;  // Dummy return
-    // TODO: Write this!!!
+
+    auto next = first;
+    ++next;
+    while(first != last && next != last)
+    {
+        if(*first > *next)
+        {
+            return false;
+        }
+
+        ++first;
+        ++next;
+    }
+    return true;
 }
 
 
