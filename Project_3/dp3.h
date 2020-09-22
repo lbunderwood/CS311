@@ -23,6 +23,7 @@
 // returns the term at the given index
 // Pre : list must not be empty (head != nullptr)
 //       0 <= index < size of list 
+// type restrictions : none (other than required by LLNode)
 template <typename ValueType>
 ValueType lookup(const LLNode<ValueType> * head,
                  std::size_t index)
@@ -77,6 +78,7 @@ void didItThrow(const std::function<void()> & ff,
 // returns false otherwise
 // Pre : first < last
 //       first and last must be forward iterators specifying a continuous range
+// type restrictions : items in array must be comparable by <
 template <typename FDIter>
 bool checkSorted(FDIter first,
                  FDIter last)
@@ -90,7 +92,7 @@ bool checkSorted(FDIter first,
     while(first != last && next != last)
     {
         // if something is out of order, return false
-        if(*first > *next)
+        if(*next < *first)
         {
             return false;
         }
