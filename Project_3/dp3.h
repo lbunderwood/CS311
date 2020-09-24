@@ -19,11 +19,13 @@
 
 
 // lookup function for LLNode
+// THIS FUNCTION MAY THROW (see preconditions)
 // takes head pointer for an LLNode, and an index
 // returns the term at the given index
 // Pre : list must not be empty (head != nullptr)
-//       0 <= index < size of list 
-// type restrictions : none (other than required by LLNode)
+//       0 <= index < size of list
+//       std::out_of_range will be thrown otherwise
+// type restrictions : none (other than those required by LLNode)
 template <typename ValueType>
 ValueType lookup(const LLNode<ValueType> * head,
                  std::size_t index)

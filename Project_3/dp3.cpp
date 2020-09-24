@@ -17,6 +17,7 @@ using std::function;
 
 
 // didItThrow function for error handling
+// THIS FUNCTION MAY THROW (keep reading for details)
 // takes function pointer and bool
 // returns bool by parameter reference
 // returns true and re-throws exception if the given function throws an exception
@@ -53,9 +54,9 @@ int gcd(int a,
         return b;
     }
 
-    // RECURSIVE CASE
+    // RECURSIVE CASES
 
-    // Appropriate ordering is neccessary for everything to work
+    // Appropriate ordering of a, b is neccessary for everything to work
     else if (a > b)
     {
         return gcd(b, a);
