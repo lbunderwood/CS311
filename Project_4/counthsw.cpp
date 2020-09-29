@@ -16,15 +16,18 @@ int countHSW(int& dim_x, int& dim_y,
              const int& start_x, const int& start_y,
              const int& finish_x, const int& finish_y)
 {
-    Board_Type board = createBoard(dim_x, dim_y, hole_x, hole_y);
+    Board_Type board = createBoard(dim_x, dim_y, 
+                                   hole_x, hole_y,
+                                   start_x, start_y);
 
     return countHSW_recurse(board, start_x + 1, start_y + 1, 
                             finish_x + 1, finish_y + 1);
 }
 
 // ADD COMMENTS HERE
-Board_Type& createBoard(int& dim_x, int& dim_y, 
-                        const int& hole_x, const int& hole_y)
+Board_Type createBoard(int& dim_x, int& dim_y, 
+                       const int& hole_x, const int& hole_y,
+                       const int& start_x, const int& start_y)
 {
     // create a board of the appropriate size
     // with an extra two rows and columns to create borders.
@@ -35,6 +38,9 @@ Board_Type& createBoard(int& dim_x, int& dim_y,
 
     // set hole space to 1
     board[hole_x + 1][hole_y + 1] = 1;
+
+    // set beginning space to 1
+    board[start_x + 1][start_y + 1] = 1;
 
     // set all border spaces to 1
     for(int i = 0; i < dim_x; ++i)
@@ -47,6 +53,8 @@ Board_Type& createBoard(int& dim_x, int& dim_y,
         board[0][i] = 1;
         board[dim_x - 1][i] = 1;
     }
+
+    return board;
 }
 
 // ADD COMMENTS HERE
@@ -54,11 +62,14 @@ int countHSW_recurse(Board_Type& board,
                      const int& current_x, const int& current_y,
                      const int& finish_x, const int& finish_y)
 {
+    // BASE CASE :
     // check for complete solution
-    
-    // we must be on the finish square
+
+    // if we are on the finish square
     if(current_x == finish_x && current_y == finish_y)
     {
+        // check all spaces, make sure they have all been visited
+        // this will be 
         bool complete = true;
         for(int i = 0; i < board.size(); ++i)
         {
@@ -72,15 +83,26 @@ int countHSW_recurse(Board_Type& board,
                 }
             }
 
+            // saves unneccessary iterations
             if(!complete) break;
         }
 
         // return 1 if this is a complete solution
-        if(complete) return 1;
+        if(complete)
+        {
+            board[current_x][current_y] = 0;
+            return 1;
+        }
     }
 
-    // check for dead end is unneccessary
-    // if there are no available moves left, a recursive call is not made
+    // RECURSIVE CASE :
+    // (but also could be base case if there's a dead end)
+
+    // check for available moves
+    // if there are available moves,
+    // the space to move into is set to 1, and a recursive call is made
+    // if there are no available moves left, 
+    // a recursive call is not made, and the current position is set to 0
     int total = 0;
     for(int i = -1; i < 2; ++i)
     {
@@ -99,7 +121,9 @@ int countHSW_recurse(Board_Type& board,
             }
         }
     }
-    
+    // reset current position to 0
+    board[current_x][current_y] = 0;
+
     // return all the ones we've added up so far
     return total;
 }

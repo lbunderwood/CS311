@@ -13,14 +13,15 @@
 using Board_Type = std::vector<std::vector<int>>;
 
 // ADD COMMENTS HERE
-int countHSW(const int& dim_x, const int& dim_y,
+int countHSW(int& dim_x, int& dim_y,
              const int& hole_x, const int& hole_y,
              const int& start_x, const int& start_y,
              const int& finish_x, const int& finish_y);
 
 // ADD COMMENTS HERE
-Board_Type& createBoard(int& dim_x, int& dim_y, 
-                        const int& hole_x, const int& hole_y);
+Board_Type createBoard(int& dim_x, int& dim_y, 
+                       const int& hole_x, const int& hole_y,
+                       const int& start_x, const int& start_y);
 
 // ADD COMMENTS HERE
 int countHSW_recurse(Board_Type& board,
