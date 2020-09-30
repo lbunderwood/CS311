@@ -11,12 +11,12 @@
 #include "counthsw.h"
 
 //ADD COMMENTS HERE
-int countHSW(int& dim_x, int& dim_y,
+int countHSW(const int& dim_x, const int& dim_y,
              const int& hole_x, const int& hole_y,
              const int& start_x, const int& start_y,
              const int& finish_x, const int& finish_y)
 {
-    Board_Type board = createBoard(dim_x, dim_y, 
+    Board_Type board = createBoard(dim_x + 2, dim_y + 2, 
                                    hole_x, hole_y,
                                    start_x, start_y);
 
@@ -25,15 +25,13 @@ int countHSW(int& dim_x, int& dim_y,
 }
 
 // ADD COMMENTS HERE
-Board_Type createBoard(int& dim_x, int& dim_y, 
+Board_Type createBoard(const int& dim_x, const int& dim_y, 
                        const int& hole_x, const int& hole_y,
                        const int& start_x, const int& start_y)
 {
     // create a board of the appropriate size
     // with an extra two rows and columns to create borders.
     // initialize all values to 0
-    dim_x += 2;
-    dim_y += 2;
     Board_Type board(dim_x, std::vector<int>(dim_y, 0));
 
     // set hole space to 1
