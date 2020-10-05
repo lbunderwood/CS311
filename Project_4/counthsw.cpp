@@ -10,7 +10,16 @@
 // other inclusions
 #include "counthsw.h"
 
-//ADD COMMENTS HERE
+// countHSW function
+// counts the number of possible holey spider walks on a given board
+// a board has a hole and a finish
+// every spot must be visited except the hole, which must not be
+// parameters are x and y values of the board size, hole, start, and finish
+// in that order each passed as two ints
+// PRECONDITIONS : ***ALL*** parameters must be nonegative integers
+//                 The x coordinates of the hole, start, and finish must be < dim_x
+//                 The y coordinates of the hole, start, and finish must be < dim_y
+//                 As a result of the previous three assertions, dim_x and dim_y must be > 0
 int countHSW(const int& dim_x, const int& dim_y,
              const int& hole_x, const int& hole_y,
              const int& start_x, const int& start_y,
@@ -18,16 +27,27 @@ int countHSW(const int& dim_x, const int& dim_y,
 {
     Board_Type board = createBoard(dim_x + 2, dim_y + 2, 
                                    hole_x, hole_y,
-                                   start_x, start_y);
+                                   finish_x, finish_y);
 
-    return countHSW_recurse(board, start_x + 1, start_y + 1, 
-                            finish_x + 1, finish_y + 1);
+    return countHSW_recurse(board, start_x + 1, start_y + 1);
 }
 
-// ADD COMMENTS HERE
+// createBoard function
+// creates a board on which a holey spider walk might take place
+// a board has a hole and a finish
+// a board is represented by a 2-D vector of int
+// the hole, the outer border, and any visited spaces are represented by 1's
+// so that if a space = 1, it is not a valid place to move
+// the finish is represented by a 2 so that it can be checked for easily
+// without passing around extra parameters
+// PRECONDITIONS : ***ALL*** parameters must be nonegative integers
+//                 dim_x and dim_y must be 2 larger than the actual dimensions of the board 
+//                 to allow for a border of 1's
+//                 The x coordinates of the hole, start, and finish must be < dim_x - 1
+//                 The y coordinates of the hole, start, and finish must be < dim_y - 1
 Board_Type createBoard(const int& dim_x, const int& dim_y, 
                        const int& hole_x, const int& hole_y,
-                       const int& start_x, const int& start_y)
+                       const int& finish_x, const int& finish_y)
 {
     // create a board of the appropriate size
     // with an extra two rows and columns to create borders.
@@ -37,8 +57,8 @@ Board_Type createBoard(const int& dim_x, const int& dim_y,
     // set hole space to 1
     board[hole_x + 1][hole_y + 1] = 1;
 
-    // set beginning space to 1
-    board[start_x + 1][start_y + 1] = 1;
+    // set finish space to 2
+    board[finish_x + 1][finish_y + 1] = 2;
 
     // set all border spaces to 1
     for(int i = 0; i < dim_x; ++i)
@@ -57,50 +77,35 @@ Board_Type createBoard(const int& dim_x, const int& dim_y,
 
 // ADD COMMENTS HERE
 int countHSW_recurse(Board_Type& board,
-                     const int& current_x, const int& current_y,
-                     const int& finish_x, const int& finish_y)
+                     const int& current_x, const int& current_y)
 {
     // BASE CASE :
     // check for complete solution
 
     // if we are on the finish square
-    if(current_x == finish_x && current_y == finish_y)
+    if(board[current_x][current_y] == 2)
     {
-        // check all spaces, make sure they have all been visited
-        // this will be 
-        bool complete = true;
-        for(int i = 0; i < board.size(); ++i)
-        {
-            for(int j = 0; j < board[0].size(); ++j)
-            {
-                // if there's a 0 left, it isn't a complete solution
-                if(!board[i][j])
-                {
-                    complete = false;
-                    break;
-                }
-            }
-
-            // saves unneccessary iterations
-            if(!complete) break;
-        }
-
         // return 1 if this is a complete solution
-        if(complete)
+        if(isComplete(board))
         {
-            board[current_x][current_y] = 0;
             return 1;
+        }
+        // otherwise, return 0 to save further effort on a useless partial solution
+        else
+        {
+            return 0;
         }
     }
 
     // RECURSIVE CASE :
-    // (but also could be base case if there's a dead end)
+    // (but also could be a base case if there's a dead end)
 
     // check for available moves
     // if there are available moves,
     // the space to move into is set to 1, and a recursive call is made
     // if there are no available moves left, 
     // a recursive call is not made, and the current position is set to 0
+    board[current_x][current_y] = 1;
     int total = 0;
     for(int i = -1; i < 2; ++i)
     {
@@ -109,13 +114,12 @@ int countHSW_recurse(Board_Type& board,
             // we don't want to check the current space
             if(i == 0 && j == 0) continue;
 
-            // if there's an adjacent 0, try it
-            if(!board[current_x + i][current_y + j])
+            // if there's an adjacent unvisited or final space, try it
+            if(board[current_x + i][current_y + j] == 0 
+            || board[current_x + i][current_y + j] == 2)
             {
-                board[current_x + i][current_y + j] = 1;
                 total += countHSW_recurse(board,
-                                          current_x + i, current_y + j, 
-                                          finish_x, finish_y);
+                                          current_x + i, current_y + j);
             }
         }
     }
@@ -124,4 +128,21 @@ int countHSW_recurse(Board_Type& board,
 
     // return all the ones we've added up so far
     return total;
+}
+
+// ADD COMMENTS
+bool isComplete(const Board_Type& board)
+{
+    for(int i = 0; i < board.size(); ++i)
+    {
+        for(int j = 0; j < board[0].size(); ++j)
+        {
+            // if there's a 0 left, it isn't a complete solution
+            if(board[i][j] == 0)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
 }

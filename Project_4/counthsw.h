@@ -21,11 +21,13 @@ int countHSW(const int& dim_x, const int& dim_y,
 // ADD COMMENTS HERE
 Board_Type createBoard(const int& dim_x, const int& dim_y, 
                        const int& hole_x, const int& hole_y,
-                       const int& start_x, const int& start_y);
+                       const int& finish_x, const int& finish_y);
 
 // ADD COMMENTS HERE
 int countHSW_recurse(Board_Type& board,
-                     const int& current_x, const int& current_y,
-                     const int& finish_x, const int& finish_y);
+                     const int& current_x, const int& current_y);
+
+// ADD COMMENTS HERE
+bool isComplete(const Board_Type& board);
 
 #endif // #ifndef COUNTHSW_H
