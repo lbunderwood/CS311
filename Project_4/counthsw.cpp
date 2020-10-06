@@ -42,9 +42,10 @@ int countHSW(const int& dim_x, const int& dim_y,
 // the finish is represented by a 2 so that it can be checked for easily
 // without passing around extra parameters
 // PRECONDITIONS : ***ALL*** parameters must be nonegative integers
-//                 The x coordinates of the hole and finish must be < dim_x
-//                 The y coordinates of the hole and finish must be < dim_y
-//                 As a result of the previous three assertions, dim_x and dim_y must be > 0
+//                 dim_x and dim_y must be 2 larger than the actual dimensions of the board 
+//                 to allow for a border of 1's
+//                 The x coordinates of the hole, start, and finish must be < dim_x - 1
+//                 The y coordinates of the hole, start, and finish must be < dim_y - 1
 // does not throw if preconditions are met
 Board_Type createBoard(const int& dim_x, const int& dim_y, 
                        const int& hole_x, const int& hole_y,
@@ -62,15 +63,15 @@ Board_Type createBoard(const int& dim_x, const int& dim_y,
     board[finish_x + 1][finish_y + 1] = 2;
 
     // set all border spaces to 1
-    for(int i = 0; i < dim_x; ++i)
+    for(int i = 0; i < dim_x + 2; ++i)
     {
         board[i][0] = 1;
-        board[i][dim_y - 1] = 1;
+        board[i][dim_y + 1] = 1;
     }
-    for(int i = 0; i < dim_y; ++i)
+    for(int i = 0; i < dim_y + 2; ++i)
     {
         board[0][i] = 1;
-        board[dim_x - 1][i] = 1;
+        board[dim_x + 1][i] = 1;
     }
 
     return board;
@@ -159,13 +160,12 @@ bool isComplete(const Board_Type& board)
     {
         for(int j = 0; j < board[0].size(); ++j)
         {
-            // if there's a 0, it isn't a complete solution
+            // if there's a 0 left, it isn't a complete solution
             if(board[i][j] == 0)
             {
                 return false;
             }
         }
     }
-    // if we made it this far, it's a complete solution
     return true;
 }
