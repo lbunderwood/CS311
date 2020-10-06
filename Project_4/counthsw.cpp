@@ -160,12 +160,14 @@ bool isComplete(const Board_Type& board)
     {
         for(int j = 0; j < board[0].size(); ++j)
         {
-            // if there's a 0 left, it isn't a complete solution
-            if(board[i][j] == 0)
+            // if there's a 0, it isn't a complete solution
+            if(!board[i][j])
             {
                 return false;
             }
         }
     }
+
+    // if we got this far it's complete
     return true;
 }
