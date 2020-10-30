@@ -68,7 +68,7 @@
 //     _data points to an array of value_type, allocated with new [],
 //      owned by *this, holding _capacity value_type values -- UNLESS
 //      _capacity == 0, in which case _data may be nullptr.
-// Type Restrictions : 
+// Type Restrictions : T, or value_type, must have a default constructor
 template <typename T>
 class TFSArray {
 
@@ -155,7 +155,7 @@ public:
 
     // operator[] - non-const & const
     // Pre:
-    //     ???
+    //     0 <= index < size()
     // No-Throw Guarantee
     value_type & operator[](size_type index) noexcept
     {
@@ -206,21 +206,17 @@ public:
     }
 
     // resize
-    // ??? Guarantee
+    // strong Guarantee
     void resize(size_type newsize)
     {
         // if the current array is too small, reallocate and copy
         if(newsize > _capacity)
         {
+            // Create new array with the appropriate size
             TFSArray<value_type> newArray(std::max(_capacity*2, newsize));
-            // I was using this:
-            // std::copy(begin(), end(), newArray.begin());
-            // but it wasn't doing its job so I wrote a replacement
-            // that is still O(n)
-            for(size_type i = 0; i < size(); ++i)
-            {
-                newArray[i] = (*this)[i];
-            }
+            // copy the data
+            std::copy(begin(), end(), newArray.begin());
+            // commit our changes, to meet strong guaruntee
             swap(newArray);
         }
         
@@ -230,7 +226,8 @@ public:
     }
 
     // insert
-    // ??? Guarantee
+    // basic Guarantee - 
+    // chose not to write it with strong guaruntee because it is much less efficient
     iterator insert(iterator pos,
                     const value_type & item)
     {
@@ -238,7 +235,11 @@ public:
         resize(size() + 1);
 
         // Shift all of our data down by 1
-        std::move(pos, end() - 1, pos + 1);
+        // std::move_backward(pos, end() - 1, end());
+        for(iterator i = end() - 1; i > pos; --i)
+        {
+            *i = *(i - 1);
+        }
 
         //insert the item
         *pos = item;
@@ -246,7 +247,7 @@ public:
     }
 
     // erase
-    // ??? Guarantee
+    // strong Guarantee
     iterator erase(iterator pos)
     {
         // shift all data back one to overwrite *pos
@@ -258,14 +259,14 @@ public:
     }
 
     // push_back
-    // ??? Guarantee
+    // basic Guarantee
     void push_back(const value_type & item)
     {
         insert(end(), item);
     }
 
     // pop_back
-    // ??? Guarantee
+    // basic Guarantee
     void pop_back()
     {
         erase(end()-1);
