@@ -28,13 +28,33 @@
 //     unique_ptr to LLNode2 of templated ValType
 //         - this should be the head of the list to reverse
 // Preconditions : 
-//
+//     head must point to a valid LLNode2<ValType>, or be nullptr
+// Exception Guaruntee : 
+//     Strong Guaruntee
+//         - New is called in creation of unique ptr, but only before changes are made to data
+//         - The only other operations are move operations, which do not throw.
 // Requirements on types :
-// 
+//     none, no operations are performed on ValType
 template<typename ValType>
 void reverseList(std::unique_ptr<LLNode2<ValType>>& head)
 {
-    // TODO : Write this
+    // newHead is used to store the new beginning of the list at each iteration
+    std::unique_ptr<LLNode2<ValType>> newHead = nullptr;
+    // placeHolder is used to facilitate the three-pointer rotate by storing newHead's old value
+    std::unique_ptr<LLNode2<ValType>> placeHolder = nullptr;
+
+    // until head == nullptr, keep rotating the pointers
+    // head will be nullptr when we reach the end of the list
+    while(head)
+    {
+        placeHolder = std::move(newHead);
+        newHead = std::move(head);
+        head = std::move(newHead->_next);
+        newHead->_next = std::move(placeHolder);
+    }
+
+    // make the original head = the new head, completing the reversal
+    head = std::move(newHead);
 }
 
 
@@ -78,12 +98,12 @@ public:
 public:
 
     // Default constructor
-    // 
-    LLMap()
-    {
-        data_ = std::make_unique<LLNode2<kv_type>>(kv_type(), nullptr); // dummy
-        // TODO : Write this
-    }
+    // creates an empty dataset
+    // Exception Guaruntee : 
+    //     Strong Guaruntee
+    //         - creation of data_ calls new, which can throw
+    //         - no data will be changed
+    LLMap() : data_(nullptr) {}
 
     // Move & copy constructors & assignment operators - all deleted
     LLMap(const LLMap& other) = delete;
@@ -92,6 +112,8 @@ public:
     LLMap& operator=(LLMap&& other) = delete;
 
     // Destructor - written by compiler
+    // Exception Guaruntee : 
+    //     No-throw Guaruntee
     ~LLMap() = default;
 
 
@@ -99,23 +121,27 @@ public:
 public:
 
     // Member function LLMap::size
+    // returns the size of the dataset
+    // returns 0 if data_ == nullptr
     // Preconditions : 
-    // 
+    //     none
     // Exception Guaruntee : 
-    size_type size() const
+    //     No-throw Guaruntee
+    //     size(const std::unique_ptr<LLNode2<ValType>>&) is no-throw
+    size_type size() const noexcept
     {
-        // TODO : Write this
-        return 0; // dummy
+        return size(data_);
     }
 
     // Member function LLMap::empty
+    // returns true if data_ == nullptr, false otherwise
     // Preconditions : 
-    // 
-    // Exception Guaruntee : 
-    bool empty() const
+    //     none
+    // Exception Guaruntee :
+    //     No-throw Guaruntee
+    bool empty() const 
     {
-        // TODO : Write this
-        return true; // dummy
+        return !data_;
     }
 
     // Member function LLMap::find (non-const version)
@@ -124,7 +150,7 @@ public:
     // Exception Guaruntee : 
     data_type* find(const key_type& key)
     {
-        // TODO : Write this
+        std::unique_ptr<LLNode2<kv_type>> current = nullptr;
         return &data_->_data.second; //dummy
     }
 
