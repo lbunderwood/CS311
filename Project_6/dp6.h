@@ -28,7 +28,7 @@
 //     unique_ptr to LLNode2 of templated ValType
 //         - this should be the head of the list to reverse
 // Preconditions : 
-//     head must point to a valid LLNode2<ValType>, or be nullptr
+//     head must be an lvalue and point to a valid LLNode2<ValType>, or be nullptr
 // Exception Guaruntee : 
 //     Strong Guaruntee
 //         - New is called in creation of unique ptr, but only before changes are made to data
@@ -68,7 +68,7 @@ void reverseList(std::unique_ptr<LLNode2<ValType>>& head)
 // template class LLMap
 // associative node-based data structure
 // Class Invariants : 
-//
+//     no two nodes may have the same key
 // Requirements on Types : 
 //     must have operator==
 template <typename K, typename D>
@@ -88,6 +88,10 @@ public:
     // kv_type (key-value type) is the type used to associate the 
     // object of key_type with the object of data_type
     using kv_type = std::pair<key_type, data_type>;
+
+    // nodeptr_type is the type used to refer to an LLNode2 pointer.
+    // data_ will be of this type
+    using nodeptr_type = std::unique_ptr<LLNode2<kv_type>>;
 
     // size_type is used only to describe the number of objects of kv_type
     // stored in the LLMap
@@ -130,7 +134,14 @@ public:
     //     size(const std::unique_ptr<LLNode2<ValType>>&) is no-throw
     size_type size() const noexcept
     {
-        return size(data_);
+        auto p = data_.get();      // Iterates through list
+        std::size_t counter = 0;  // Number of nodes so far
+        while (p != nullptr)
+        {
+            ++counter;
+            p = p->_next.get();
+        }
+        return counter;
     }
 
     // Member function LLMap::empty
@@ -146,12 +157,20 @@ public:
 
     // Member function LLMap::find (non-const version)
     // Preconditions : 
-    // 
+    //     key must be a valid lvalue of type key_type
     // Exception Guaruntee : 
     data_type* find(const key_type& key)
     {
-        std::unique_ptr<LLNode2<kv_type>> current = nullptr;
-        return &data_->_data.second; //dummy
+        data_type* output = nullptr;
+        traverse([&](const key_type& currentKey, data_type& currentData)
+        {
+            if(key == currentKey)
+            {
+                output = &currentData;
+            }
+        });
+
+        return output;
     }
 
     // Member function LLMap::find (const version)
@@ -160,8 +179,16 @@ public:
     // Exception Guaruntee : 
     const data_type* find(const key_type& key) const
     {
-        // TODO : Write this
-        return &data_->_data.second; //dummy
+        data_type* output = nullptr;
+        traverse([&](const key_type& currentKey, data_type& currentData)
+        {
+            if(key == currentKey)
+            {
+                output = &currentData;
+            }
+        });
+
+        return output;
     }
 
     // Member function LLMap::insert
@@ -170,7 +197,16 @@ public:
     // Exception Guaruntee : 
     void insert(const key_type& key, const data_type& data)
     {
-        // TODO : Write this
+        auto oldData = find(key);
+        if(oldData != nullptr)
+        {
+            *oldData = data;
+        }
+        else
+        {
+            push_front(data_, std::make_pair(key, data));
+        }
+        
     }
 
     // Member function LLMap::erase
@@ -180,7 +216,17 @@ public:
     // 
     void erase(const key_type& key)
     {
-        // TODO : Write this
+        auto current = data_.get();
+        auto previous = current;
+        while(current != nullptr)
+        {
+            if(current->_data.first == key);
+            {
+                previous->_next = std::move(current->_next);
+            }
+            previous = current;
+            current = current->_next.get();
+        }
     }
 
     // Member function LLMap::traverse
@@ -191,16 +237,21 @@ public:
     // Requirements on Types : 
     //
     template <typename function_type>
-    void traverse(const function_type& func)
+    void traverse(const function_type& func) const
     {
-        // TODO : Write this
+        auto current = data_.get();
+        while(current != nullptr)
+        {
+            func(current->_data.first, current->_data.second);
+            current = current->_next.get();
+        }
     }
 
 /////////// LLMap : Private data members
 private:
 
     // head pointer for an LLNode2 data structure (see llnode2.h)
-    std::unique_ptr<LLNode2<kv_type>> data_;
+    nodeptr_type data_;
 
 };
 
