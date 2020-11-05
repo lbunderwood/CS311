@@ -70,8 +70,9 @@ void reverseList(std::unique_ptr<LLNode2<ValType>>& head)
 // associative node-based data structure
 // Class Invariants : 
 //     no two nodes may have the same key
+//     data_ must either be nullptr or point to a nullptr-terminated linked list of LLNode2
 // Requirements on Types : 
-//     must have operator==
+//     K (key_type) must have operator==
 template <typename K, typename D>
 class LLMap
 {
@@ -137,8 +138,8 @@ public:
     {
         // I tried to simply do
         // return size(data_);
-        // calling the function size from llnode2.h, but for some reason the compiler wouldn't
-        // recognize the function call, so I elected to simply copy it's design
+        // calling function size from llnode2.h, but for some reason the compiler wouldn't
+        // recognize the function call, so I elected to simply copy it's design.
         // I recognize that this violates the SRP and DRY principle, but it's what works
 
         // THIS CODE COPIED FROM llnode2.h WRITTEN BY GLENN CHAPPELL
@@ -164,16 +165,24 @@ public:
     }
 
     // Member function LLMap::find (non-const version)
+    // returns a pointer to the data associated with the provided key,
+    // or nullptr if the key is not in the dataset
     // Preconditions : 
     //     key must be a valid lvalue of type key_type
     // Exception Guaruntee : 
+    //     Strong Guaruntee
+    //         - data is never modified, so if an exception is thrown,
+    //           there will be no change visible to the caller
     data_type* find(const key_type& key)
     {
         data_type* output = nullptr;
+
+        // traverse the list, checking for keys matching the one given
         traverse([&](const key_type& currentKey, data_type& currentData)
         {
             if(key == currentKey)
             {
+                // if we find a match, set output to currentData's address
                 output = &currentData;
             }
         });
@@ -182,16 +191,24 @@ public:
     }
 
     // Member function LLMap::find (const version)
+    // returns a const pointer to the data associated with the provided key,
+    // or nullptr if the key is not in the dataset
     // Preconditions : 
-    // 
+    //     key must be a valid lvalue of type key_type
     // Exception Guaruntee : 
+    //     Strong Guaruntee
+    //         - data is never modified, so if an exception is thrown,
+    //           there will be no change visible to the caller
     const data_type* find(const key_type& key) const
     {
         data_type* output = nullptr;
+
+        // traverse the list, checking for keys matching the one given
         traverse([&](const key_type& currentKey, data_type& currentData)
         {
             if(key == currentKey)
             {
+                // if we find a match, set output to currentData's address
                 output = &currentData;
             }
         });
@@ -200,57 +217,73 @@ public:
     }
 
     // Member function LLMap::insert
+    // adds a node with the given key value pair
+    // if another node has the same key, that node is deleted
     // Preconditions : 
-    // 
+    //     key and data must be valid lvalues of key_type and data_type 
     // Exception Guaruntee : 
+    //     Basic Guaruntee
+    //         - it is possible that a node could be erased, then push_front throws,
+    //           leaving the data in a modified state
     void insert(const key_type& key, const data_type& data)
     {
-        auto oldData = find(key);
-        if(oldData)
+        // if find(key) does not return nullptr, delete the old node
+        if(find(key))
         {
-            *oldData = data;
+            erase(key);
         }
-        else
-        {
-            push_front(data_, std::make_pair(key, data));
-        }
-        
+
+        // add the new node
+        push_front(data_, std::make_pair(key, data));        
     }
 
     // Member function LLMap::erase
+    // erases a node with the given key
+    // does nothing if no such node exists
     // Preconditions : 
-    // 
+    //     key must be a valid lvalue of key_type
     // Exception Guaruntee : 
-    // 
+    //     Strong Guaruntee
+    //         - the only modification made to the data would be the final operation performed,
+    //           so the function will either throw before modifying or succeed
     void erase(const key_type& key)
     {
-        auto current = data_.get();
-        auto previous = &data_;
+        auto current = data_.get(); // raw pointer to current node
+        auto previous = &data_;     // raw pointer to unique_ptr to previous node
+
         while(current)
         {
+            // when we find the key, set the previous unique_ptr to skip the deleted node
             if(current->_data.first == key)
             {
-                (*previous) = std::move(current->_next);
+                *previous = std::move(current->_next);
                 break;
             }
+
+            // move up both pointers for the next iteration
             previous = &(current->_next);
             current = current->_next.get();
         }
     }
 
     // Member function LLMap::traverse
+    // calls a function on every node in the list
     // Preconditions : 
-    // 
+    //     function passed in must take parameters of key_type and data_type and return void
     // Exception Guaruntee : 
-    //
+    //     Basic Guaruntee
+    //         - func may modify data and throw
     // Requirements on Types : 
-    //
+    //     function_type must be a callable object that takes parameters as listed above
     template <typename function_type>
     void traverse(const function_type& func) const
     {
         auto current = data_.get();
+
+        // cycle through the list
         while(current)
         {
+            // call the function on every node
             func(current->_data.first, current->_data.second);
             current = current->_next.get();
         }
