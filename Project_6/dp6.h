@@ -12,6 +12,7 @@
 #include <utility>
 #include <cstddef>
 #include <memory>
+#include <iostream>
 
 // file inclusions
 #include "llnode2.h"
@@ -134,6 +135,13 @@ public:
     //     size(const std::unique_ptr<LLNode2<ValType>>&) is no-throw
     size_type size() const noexcept
     {
+        // I tried to simply do
+        // return size(data_);
+        // calling the function size from llnode2.h, but for some reason the compiler wouldn't
+        // recognize the function call, so I elected to simply copy it's design
+        // I recognize that this violates the SRP and DRY principle, but it's what works
+
+        // THIS CODE COPIED FROM llnode2.h WRITTEN BY GLENN CHAPPELL
         auto p = data_.get();      // Iterates through list
         std::size_t counter = 0;  // Number of nodes so far
         while (p != nullptr)
@@ -198,7 +206,7 @@ public:
     void insert(const key_type& key, const data_type& data)
     {
         auto oldData = find(key);
-        if(oldData != nullptr)
+        if(oldData)
         {
             *oldData = data;
         }
@@ -217,14 +225,15 @@ public:
     void erase(const key_type& key)
     {
         auto current = data_.get();
-        auto previous = current;
-        while(current != nullptr)
+        auto previous = &data_;
+        while(current)
         {
-            if(current->_data.first == key);
+            if(current->_data.first == key)
             {
-                previous->_next = std::move(current->_next);
+                (*previous) = std::move(current->_next);
+                break;
             }
-            previous = current;
+            previous = &(current->_next);
             current = current->_next.get();
         }
     }
@@ -240,7 +249,7 @@ public:
     void traverse(const function_type& func) const
     {
         auto current = data_.get();
-        while(current != nullptr)
+        while(current)
         {
             func(current->_data.first, current->_data.second);
             current = current->_next.get();
