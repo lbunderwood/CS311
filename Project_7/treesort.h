@@ -20,6 +20,8 @@
 // For std::iterator_traits
 #include <memory>
 // For std::unique_ptr, std::make_unique
+#include <deque>
+// For std::deque
 
 // *******************************************************
 // * YOU MIGHT WANT TO GET RID OF THE FOLLOWING INCLUDES *
@@ -66,14 +68,12 @@ public:
     // Written by compiler
     ~BSNode() = default;
 
-////////// BSNode : Member Functions
+////////// BSNode : Friend Helper Functions
 public:
 
-    //
-    insert(const value_type& data)
-    {
-
-    }
+    // see documentation below
+    friend void insert(const BSNode<value_type>& head, const value_type& data);
+    friend std::deque<value_type> inorder(const BSNode<value_type>& head);
 
 ////////// BSNode : Member Variables
 public:
@@ -87,7 +87,37 @@ public:
 
 };
 
+///////////////////////////////////////////////////////
+/////////   BSNode Helper Functions
+///////////////////////////////////////////////////////
 
+// insert
+// Inserts an item into a BSNode tree given the root pointer and the item
+// Pre:
+//     ???
+// Requirements on Types:
+//     ???
+// Exception safety guarantee:
+//     ???
+template<typename value_type>
+void insert(const BSNode::ptr_type& head, const value_type& data)
+{
+    // TODO : Write this
+}
+
+// inorder
+// Returns an inorder traversal of a BSNode tree given the root pointer
+// Pre:
+//     ???
+// Requirements on Types:
+//     ???
+// Exception safety guarantee:
+//     ???
+template<typename value_type>
+std::deque<value_type> inorder(const BSNode::ptr_type& head)
+{
+    return std::deque<value_type>();
+}
 
 // treesort
 // Sort a given range using Treesort.
@@ -102,7 +132,7 @@ void treesort(FDIter first, FDIter last)
 {
     // Value is the type that FDIter points to
     using Value = typename std::iterator_traits<FDIter>::value_type;
-
+    BSNode::ptr_type<Value> root = std::make_unique<Value>;;
     
 }
 
