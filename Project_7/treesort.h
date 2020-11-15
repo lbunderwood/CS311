@@ -128,7 +128,11 @@ void insert(std::unique_ptr<BSNode<V>>& root, const V& data)
 // inorder
 // Returns an inorder traversal of a BSNode tree given the root pointer and an iterator to write to
 // Pre:
-//     ???
+//     root must be a unique pointer to the root of a valid BSNode tree.
+//     iter must be a valid iterator with enough places in the container it iterates through
+//      to contain the data stored in the tree rooted at root.
+//     The type of the data that iter refers to must be the same as the type stored in the BSNode that
+//      root points to.
 // Requirements on Types:
 //     The type reffered to by iter must have a copy assignment operator
 //     Iter must have a prefix operator++
@@ -153,12 +157,15 @@ void inorder(std::unique_ptr<BSNode<typename std::iterator_traits<Iter>::value_t
 
 // treesort
 // Sort a given range using Treesort.
+// function prototype and the "using Value = ..." statement written by Glenn Chappell
 // Pre:
-//     ???
+//     first and last must be iterators that refer to the beginning and 
+//      one past the end of a container, respectively
 // Requirements on Types:
-//     ???
+//     FDIter must have operator!=, copy assignment operator, prefix operator++, and
+//      everything required by insert and inorder
 // Exception safety guarantee:
-//     ???
+//     Basic Guaruntee - inorder can only offer the basic guaruntee
 template<typename FDIter>
 void treesort(FDIter first, FDIter last)
 {
@@ -180,4 +187,3 @@ void treesort(FDIter first, FDIter last)
 
 
 #endif //#ifndef FILE_TREESORT_H_INCLUDED
-
