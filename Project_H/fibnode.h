@@ -16,7 +16,9 @@
 #include <cstddef>
     // For std::size_t
 
-// other inclusions
+// Forward declaration of FibHeap for friend declaration
+template<typename K, typename V>
+class FibHeap;
 
 // comments
 // comments
@@ -49,7 +51,7 @@ public:
 public:
 
     // FibHeap needs access to FibNode's priavate members
-    friend class FibHeap<key_type, value_type>;
+    friend FibHeap<key_type, value_type>;
 
 
 // FibNode : friend declaration
@@ -64,10 +66,10 @@ public:
           next_(this), prev_(this), parent_(nullptr), child_(nullptr) {}
 
     // Move and Copy Constructors and Assignment Operators
-    FibNode(const FibNode& other);
-    FibNode operator=(const FibNode& other);
-    FibNode(FibNode&& other);
-    FibNode operator=(FibNode && other);
+    FibNode(const FibNode& other) = default;
+    FibNode operator=(const FibNode& other) = default;
+    FibNode(FibNode&& other) = default;
+    FibNode operator=(FibNode && other) = default;
 
     // Destructor
     ~FibNode() = default;

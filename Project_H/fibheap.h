@@ -10,10 +10,12 @@
 // Standard Library Inclusions
 #include <utility>
     // For std::pair
-#include <vector>
-    // For std::vector
+#include <set>
+    // For std::set
 #include <memory>
     // For std::unique_ptr, std::make_unique
+#include <cstddef>
+    // For std::size_t
 
 // Other File Inclusions
 #include "fibnode.h"
@@ -37,14 +39,17 @@ public:
     // that is associated with each node
     using value_type = V;
 
+    // size_type will be used to keep track of the number of children
+    using size_type = std::size_t;
+
 // FibHeap : constructors and destructors
 public:
 
     // Default Constructor
-    FibHeap() : min_(nullptr) {}
+    FibHeap() : min_(nullptr), rootCount_(0) {}
 
     // One-Parameter Constructor
-    FibHeap(const FibNode<key_type, value_type>& node) : min_(&FibNode) {}
+    FibHeap(const FibNode<key_type, value_type>& node) : min_(&node), rootCount_(1) {}
 
     // Move and Copy Constructors and Assignment Operators
     FibHeap(const FibHeap& other);
@@ -53,7 +58,13 @@ public:
     FibHeap operator=(FibHeap && other);
 
     // Destructor
-    ~FibHeap();
+    ~FibHeap()
+    {
+        while(min_)
+        {
+            deleteMin();
+        }
+    }
 
 // FibHeap : member functions
 public:
@@ -67,21 +78,25 @@ public:
 
     // merge function
     // takes a FibNode and adds it and its siblings to the list of roots
-    void merge(const FibNode<key_type, value_type>& other)
+    void merge(FibNode<key_type, value_type>* other)
     {
-        // holds onto the end of the list being added
-        auto placeHolder = other.prev_;
-
-        // connect up the ends of this and the new list
-        (min_->prev_)->next_ = &other;
-        placeHolder->next_ = min_;
-        other.prev_ = min_->prev_;
-        min->prev_ = placeHolder;
-
-        // make sure that min_ is still correct
-        if(other.min_->key_ < min_->key_)
+        // we only want to do anything if other is not nullptr
+        if(other)
         {
-            min_ = other.min_;
+            // holds onto the end of the list being added
+            auto placeHolder = other->prev_;
+
+            // connect up the ends of this and the new list
+            (min_->prev_)->next_ = other;
+            placeHolder->next_ = min_;
+            other->prev_ = min_->prev_;
+            min_->prev_ = placeHolder;
+
+            // make sure that min_ is still correct
+            if(other->key_ < min_->key_)
+            {
+                min_ = other;
+            }
         }
     }
 
@@ -97,7 +112,7 @@ public:
     void insert(const key_type& key, const value_type& value)
     {
         // create a new node
-        FibNode<key_type, value_type>* node = new node(key, value);
+        FibNode<key_type, value_type>* node = new FibNode<key_type, value_type>(key, value);
         
         // if there are already nodes in the heap
         if(min_)
@@ -118,6 +133,9 @@ public:
         {
             min_ = node;
         }
+
+        // increase the number of roots
+        ++rootCount_;
         
     }
 
@@ -125,7 +143,19 @@ public:
     // 
     void deleteMin()
     {
+        merge(min_->child_);
+        min_ = min_->next_;
+        delete min_->prev_;
 
+        std::set<int> degrees;
+        auto current = min_;
+        do
+        {
+            if(!degrees.insert(current->childCount).second)
+            {
+                
+            }
+        }while(current != min_)
     }
 
     // decreaseKey function
@@ -141,6 +171,9 @@ private:
 
     // always points to the minimum-key node
     FibNode<key_type, value_type>* min_;
+
+    // keeps track of the number of roots, which gives slight performance boost
+    size_type rootCount_;
 
 };
 
