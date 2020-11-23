@@ -8,16 +8,14 @@
 #define FIBHEAP_H
 
 // Standard Library Inclusions
-#include <utility>
-    // For std::pair
 #include <vector>
     // For std::vector
-#include <memory>
-    // For std::unique_ptr, std::make_unique
 #include <cstddef>
     // For std::size_t
 #include <cmath>
     // For log
+#include <algorithm>
+    // For std::max
 
 // Other File Inclusions
 #include "fibnode.h"
@@ -143,7 +141,7 @@ private:
     void combineTrees()
     {
         // create array to keep track of the number of children each root has
-        std::vector<FibNode<key_type, value_type>*> degrees((int)(log(nodeCount_)/log(2)), nullptr);
+        std::vector<FibNode<key_type, value_type>*> degrees(std::max((int)(log(nodeCount_)/log(2)), 1), nullptr);
 
         // use current to cycle through the nodes
         auto current = min_;
@@ -155,45 +153,61 @@ private:
             auto currentDegree = current->childCount_;
 
             // if another node has that degree already
-            if(degrees[currentDegree])
+            while(true)
             {
-                // make the larger one the child of the smaller one
-                if(current->key_ < degrees[currentDegree]->key_)
+                if(degrees[currentDegree])
                 {
-                    // remove the other node from the root list
-                    isolate(degrees[currentDegree]);
-
-                    makeChild(current, degrees[currentDegree]);
-
-                    // make sure min_ still points to a root
-                    if(degrees[currentDegree] == min_)
+                    // make the larger one the child of the smaller one
+                    if(current->key_ < degrees[currentDegree]->key_)
                     {
-                        min_ = min_->next_;
-                    }
+                        // make sure min_ will continue to point to a root
+                        if(degrees[currentDegree] == min_)
+                        {
+                            min_ = min_->next_;
+                        }
 
-                    // update degrees
-                    degrees[currentDegree] = nullptr;
-                    degrees[current->childCount_] = current;
+                        // remove the other node from the root list
+                        isolate(degrees[currentDegree]);
+
+                        makeChild(current, degrees[currentDegree]);
+
+                        // update degrees
+                        degrees[currentDegree] = 0;
+                        
+                        // we might have just created a new conflict of degree values, 
+                        //in which case we don't want to update this, but instead repeat this process
+                        if(!degrees[current->childCount_])
+                        {
+                            degrees[current->childCount_] = current;
+                            break;
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                    else
+                    {
+                        // remove current from the root list
+                        isolate(current);
+
+                        makeChild(degrees[current->childCount_], current);
+
+                        // make sure min_ still contains a root
+                        if(current == min_)
+                        {
+                            min_ = min_->next_;
+                        }
+                        break;
+                    }
                 }
+                // this is the first node we've found with that degree
                 else
                 {
-                    // remove current from the root list
-                    isolate(current);
-
-                    makeChild(degrees[current->childCount_], current);
-
-                    // make sure min_ still contains a root
-                    if(current == min_)
-                    {
-                        min_ = min_->next_;
-                    }
+                    // stick it in the array
+                    degrees[current->childCount_] = current;
+                    break;
                 }
-            }
-            // this is the first node we've found with that degree
-            else
-            {
-                // stick it in the array
-                degrees[current->childCount_] = current;
             }
 
             current = next;
@@ -273,6 +287,12 @@ public:
     // 
     void deleteMin()
     {
+        // if there are no more nodes, we don't want to double-delete
+        if(nodeCount_ <= 0)
+        {
+            return;
+        }
+
         // make any children of min_ into roots
         merge(min_->child_);
 
@@ -280,20 +300,30 @@ public:
         auto newMin = min_->prev_;
 
         // edit out the old min_ 
-        min_->prev_->next_ = min_->next_;
-        min_->next_->prev_ = min_->prev_;
+        isolate(min_);
 
         // delete the old min_
         delete min_;
-        --nodeCount_;
 
         min_ = newMin;
 
         // consolidate existing trees to make finding the new min_ logarithmic time
         combineTrees();
 
-        // change min_ to the new min
-        min_ = findMin();
+        // if we just deleted the last node, we want to make sure its obvious
+        // that there are no more nodes
+        if(nodeCount_ <= 1)
+        {
+            min_ = nullptr;
+        }
+        // otherwise, proceed as usual
+        else
+        {
+            // change min_ to the new min
+            min_ = findMin();
+        }
+
+        --nodeCount_;
     }
 
     // decreaseKey function
