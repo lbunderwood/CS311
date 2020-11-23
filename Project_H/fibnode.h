@@ -66,10 +66,10 @@ public:
           next_(this), prev_(this), parent_(nullptr), child_(nullptr) {}
 
     // Move and Copy Constructors and Assignment Operators
-    FibNode(const FibNode& other) = default;
-    FibNode operator=(const FibNode& other) = default;
-    FibNode(FibNode&& other) = default;
-    FibNode operator=(FibNode && other) = default;
+    FibNode(const FibNode& other) = delete;
+    FibNode operator=(const FibNode& other) = delete;
+    FibNode(FibNode&& other) = delete;
+    FibNode operator=(FibNode && other) = delete;
 
     // Destructor
     ~FibNode() = default;

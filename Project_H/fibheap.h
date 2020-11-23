@@ -48,7 +48,7 @@ public:
 public:
 
     // Default Constructor
-    FibHeap() : min_(nullptr), rootCount_(0) {}
+    FibHeap() : min_(nullptr), nodeCount_(0) {}
 
     // Move and Copy Constructors and Assignment Operators
     FibHeap(const FibHeap& other);
@@ -68,81 +68,6 @@ public:
 
 // FibHeap : private member functions
 private:
-
-    // makeChild function
-    // takes two FibNode pointers and makes the second a child of the first
-    // both must already be a part of the heap, in order to preserve nodeCount
-    void makeChild(FibNode<key_type, value_type>* parent, FibNode<key_type, value_type>* child)
-    {
-        // we only want to do anything if both are not nullptr
-        if(parent && child)
-        {
-            // there are other children
-            if(parent->child_)
-            {
-                // insert node between parent->child_ and parent->child_->next_
-                child->next_ = min_->next_;
-                child->prev_ = min_;
-                ((parent->child_)->next_)->prev_ = child;
-                (parent->child_)->next_ = child;
-            }
-            // otherwise, it is the only child
-            else
-            {
-                parent->child_ = child
-            }
-        }
-    }
-
-    // combineTrees function
-    //
-    void combineTrees()
-    {
-        // create array to keep track of the number of children each root has
-        std::vector<FibNode<key_type, value_type>*> degrees((int)(log(nodeCount_)/log(2)), nullptr);
-
-        // use current to cycle through the nodes
-        auto current = min_;
-        
-        do
-        {
-            // hold onto this so our spot is not lost
-            auto next = current->next_;
-
-            // if another node has that degree already
-            if(degrees[current->childCount_])
-            {
-                // edit current out of the existing root list
-                (current->next_)->prev_ = current->prev_;
-                (current->prev_)->next_ = current->next_;
-
-                // make the larger one the child of the smaller one
-                if(current->key_ < degrees[current->childCount_]->key_)
-                    makeChild(current, degrees[current->childCount_]);
-                else
-                    makeChild(degrees[current->childCount_], current);
-            }
-            // this is the first node we've found with that degree
-            else
-            {
-                // stick it in the array
-                degrees[current->childCount_] = current;
-            }
-
-            current = next;
-
-        }while(current != min_)
-    }
-
-// FibHeap : public member functions
-public:
-
-    // findMin function
-    // 
-    FibNode<key_type, value_type>* findMin()
-    {
-        return min_;
-    }
 
     // merge function
     // takes a FibNode pointer and adds it and its siblings to the list of roots
@@ -166,7 +91,150 @@ public:
             {
                 min_ = other;
             }
+
+            (other->parent_)->childCount_ = 0;
+            other->parent_ = nullptr;
         }
+    }
+
+    // makeChild function
+    // takes two FibNode pointers and makes the second a child of the first
+    // both must already be a part of the heap, in order to preserve nodeCount
+    void makeChild(FibNode<key_type, value_type>* parent, FibNode<key_type, value_type>* child)
+    {
+        // we only want to do anything if both are not nullptr
+        if(parent && child)
+        {
+            // there are other children
+            if(parent->child_)
+            {
+                // insert node between parent->child_ and parent->child_->next_
+                child->next_ = min_->next_;
+                child->prev_ = min_;
+                ((parent->child_)->next_)->prev_ = child;
+                (parent->child_)->next_ = child;
+            }
+            // otherwise, it is the only child
+            else
+            {
+                parent->child_ = child;
+            }
+
+            child->parent_ = parent;
+            ++parent->childCount_;
+        }
+    }
+
+    // isolate function
+    // takes a node pointer and removes it from its sibling list
+    void isolate(FibNode<key_type, value_type>* node)
+    {
+        // edit it out of its sibling list
+        (node->next_)->prev_ = node->prev_;
+        (node->prev_)->next_ = node->next_;
+
+        // make the node point only to itself
+        node->prev_ = node;
+        node->next_ = node;
+    }
+
+    // combineTrees function
+    //
+    void combineTrees()
+    {
+        // create array to keep track of the number of children each root has
+        std::vector<FibNode<key_type, value_type>*> degrees((int)(log(nodeCount_)/log(2)), nullptr);
+
+        // use current to cycle through the nodes
+        auto current = min_;
+        
+        do
+        {
+            // hold onto these for later use
+            auto next = current->next_;
+            auto currentDegree = current->childCount_;
+
+            // if another node has that degree already
+            if(degrees[currentDegree])
+            {
+                // make the larger one the child of the smaller one
+                if(current->key_ < degrees[currentDegree]->key_)
+                {
+                    // remove the other node from the root list
+                    isolate(degrees[currentDegree]);
+
+                    makeChild(current, degrees[currentDegree]);
+
+                    // make sure min_ still points to a root
+                    if(degrees[currentDegree] == min_)
+                    {
+                        min_ = min_->next_;
+                    }
+
+                    // update degrees
+                    degrees[currentDegree] = nullptr;
+                    degrees[current->childCount_] = current;
+                }
+                else
+                {
+                    // remove current from the root list
+                    isolate(current);
+
+                    makeChild(degrees[current->childCount_], current);
+
+                    // make sure min_ still contains a root
+                    if(current == min_)
+                    {
+                        min_ = min_->next_;
+                    }
+                }
+            }
+            // this is the first node we've found with that degree
+            else
+            {
+                // stick it in the array
+                degrees[current->childCount_] = current;
+            }
+
+            current = next;
+
+        }while(current != min_);
+    }
+
+    // findMin function
+    // 
+    FibNode<key_type, value_type>* findMin()
+    {
+        // use smallest to keep track of the min found
+        auto smallest = min_;
+        // use current to cycle through the nodes
+        auto current = min_->next_;
+        
+        // cycle through all root nodes
+        while(current != min_)
+        {
+            // if the current one is smaller, make it the new smallest
+            if(current->key_ < smallest->key_)
+            {
+                smallest = current;
+            }
+
+            // advance current node
+            current = current->next_;
+        }
+
+        // return the min
+        return smallest;
+    }
+
+// FibHeap : public member functions
+public:
+
+    // getMin function
+    // 
+    FibNode<key_type, value_type>* getMin()
+    {
+        return min_;
     }
 
     // insert function
@@ -208,14 +276,24 @@ public:
         // make any children of min_ into roots
         merge(min_->child_);
 
-        // set min_ to be something else
-        min_ = min_->next_;
+        // a temporary value so we dont lose the rest of the roots
+        auto newMin = min_->prev_;
+
+        // edit out the old min_ 
+        min_->prev_->next_ = min_->next_;
+        min_->next_->prev_ = min_->prev_;
 
         // delete the old min_
-        delete min_->prev_;
+        delete min_;
+        --nodeCount_;
+
+        min_ = newMin;
 
         // consolidate existing trees to make finding the new min_ logarithmic time
         combineTrees();
+
+        // change min_ to the new min
+        min_ = findMin();
     }
 
     // decreaseKey function

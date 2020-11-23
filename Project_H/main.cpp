@@ -16,28 +16,16 @@ int main()
 {
     FibHeap<int, int> heap;
 
+    heap.insert(2, 2);
     heap.insert(3, 3);
-    heap.insert(4, 5);
-    heap.insert(5, 8);
-
-    
-    std::cout << heap.findMin()->getKey() << " " << heap.findMin()->getValue() << std::endl;
-
     heap.insert(0, 1);
     heap.insert(1, 1);
-    heap.insert(2, 2);
 
-    std::cout << heap.findMin()->getKey() << " " << heap.findMin()->getValue() << std::endl;
-
-    FibHeap<int, int> heap2;
-
-    heap2.insert(6, 13);
-    heap2.insert(-1, 1);
-
-    heap.merge(heap2);
-    
-    std::cout << heap.findMin()->getKey() << " " << heap.findMin()->getValue() << std::endl;
-
+    for(int i = 0; i < 8; ++i)
+    {
+        std::cout << heap.getMin()->getKey() << " " << heap.getMin()->getValue() << std::endl;
+        heap.deleteMin();
+    }
 
     return 0;
 }
