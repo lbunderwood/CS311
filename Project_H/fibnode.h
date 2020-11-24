@@ -38,14 +38,8 @@ public:
     // that is associated with this node
     using value_type = V;
 
-    // nodeptr_type will be used to point to FiboNodes and the trees rooted at
-    // them by extension
-    using nodeptr_type = std::unique_ptr<FibNode<key_type, value_type>>;
-
     // size_type will be used to keep track of the number of children
     using size_type = std::size_t;
-
-
 
 // FibNode : friend declaration
 public:

@@ -18,29 +18,29 @@ int main()
 
     heap.insert(2, 2);
     heap.insert(3, 3);
-    heap.insert(0, 1);
+    heap.insert(0, 0);
     heap.insert(1, 1);
 
-    for(int i = 0; i < 4; ++i)
+    for(int i = 0; i < 2; ++i)
     {
         std::cout << heap.getMin()->getKey() << " " << heap.getMin()->getValue() << std::endl;
         heap.deleteMin();
     }
-/*
-    heap.insert(4, 20);
-    heap.insert(7, 31);
-    heap.insert(18, 11);
-    heap.insert(-5, 13);
-    heap.insert(82, 24);
-    heap.insert(13, 35);
-    heap.insert(0, 6);
-    heap.insert(3000, 17);
+
+    heap.insert(11, 11);
+    heap.insert(6, 6);
+    heap.insert(8, 8);
+    heap.insert(9, 9);
+    heap.insert(5, 5);
+    heap.insert(10, 10);
+    heap.insert(7, 7);
+    heap.insert(4, 4);
 
     for(int i = 0; i < 6; ++i)
     {
         std::cout << heap.getMin()->getKey() << " " << heap.getMin()->getValue() << std::endl;
         heap.deleteMin();
     }
-*/
+
     return 0;
 }

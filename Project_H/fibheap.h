@@ -14,8 +14,6 @@
     // For std::size_t
 #include <cmath>
     // For log
-#include <algorithm>
-    // For std::max
 
 // Other File Inclusions
 #include "fibnode.h"
@@ -91,6 +89,7 @@ private:
             }
 
             (other->parent_)->childCount_ = 0;
+            (other->parent_)->child_ = nullptr;
             other->parent_ = nullptr;
         }
     }
@@ -141,7 +140,7 @@ private:
     void combineTrees()
     {
         // create array to keep track of the number of children each root has
-        std::vector<FibNode<key_type, value_type>*> degrees(std::max((int)(log(nodeCount_)/log(2)), 1), nullptr);
+        std::vector<FibNode<key_type, value_type>*> degrees((int)(log(nodeCount_)/log(2)) + 1, nullptr);
 
         // use current to cycle through the nodes
         auto current = min_;
@@ -150,11 +149,11 @@ private:
         {
             // hold onto these for later use
             auto next = current->next_;
-            auto currentDegree = current->childCount_;
 
             // if another node has that degree already
             while(true)
             {
+                auto currentDegree = current->childCount_;
                 if(degrees[currentDegree])
                 {
                     // make the larger one the child of the smaller one
@@ -181,24 +180,29 @@ private:
                             degrees[current->childCount_] = current;
                             break;
                         }
-                        else
-                        {
-
-                        }
                     }
                     else
                     {
-                        // remove current from the root list
-                        isolate(current);
-
-                        makeChild(degrees[current->childCount_], current);
-
                         // make sure min_ still contains a root
                         if(current == min_)
                         {
                             min_ = min_->next_;
                         }
-                        break;
+
+                        // remove current from the root list
+                        isolate(current);
+
+                        makeChild(degrees[currentDegree], current);
+                        
+                        // update degrees
+                        degrees[currentDegree] = 0;
+                        if(!degrees[(current->parent_)->childCount_])
+                        {
+                            degrees[(current->parent_)->childCount_] = current->parent_;
+                            break;
+                        }
+
+                        current = current->parent_;
                     }
                 }
                 // this is the first node we've found with that degree
