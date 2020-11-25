@@ -82,15 +82,21 @@ private:
             other->prev_ = min_->prev_;
             min_->prev_ = placeHolder;
 
-            // make sure that min_ is still correct
-            if(other->key_ < min_->key_)
-            {
-                min_ = other;
-            }
-
+            // reset children of former parent
             (other->parent_)->childCount_ = 0;
             (other->parent_)->child_ = nullptr;
-            other->parent_ = nullptr;
+
+            // make sure all new roots no longer have parents and set new min
+            auto current = other;
+            do
+            {
+                current->parent_ = nullptr;
+                current = current->next_;
+                if(current->key_ < min_->key_)
+                {
+                    min_ = current;
+                }
+            }while(current != other);
         }
     }
 
@@ -106,8 +112,8 @@ private:
             if(parent->child_)
             {
                 // insert node between parent->child_ and parent->child_->next_
-                child->next_ = min_->next_;
-                child->prev_ = min_;
+                child->next_ = (parent->child_)->next_;
+                child->prev_ = parent->child_;
                 ((parent->child_)->next_)->prev_ = child;
                 (parent->child_)->next_ = child;
             }
