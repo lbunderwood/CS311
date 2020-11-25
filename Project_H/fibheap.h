@@ -146,7 +146,7 @@ private:
     void combineTrees()
     {
         // create array to keep track of the number of children each root has
-        std::vector<FibNode<key_type, value_type>*> degrees((int)(log(nodeCount_)/log(2)) + 1, nullptr);
+        std::vector<FibNode<key_type, value_type>*> degrees((int)(log(nodeCount_)/log(2))+1, nullptr);
 
         // use current to cycle through the nodes
         auto current = min_;
@@ -169,6 +169,12 @@ private:
                         if(degrees[currentDegree] == min_)
                         {
                             min_ = min_->next_;
+                        }
+
+                        // make sure next is not about to be moved
+                        if(degrees[currentDegree] == next)
+                        {
+                            next = next->next_;
                         }
 
                         // remove the other node from the root list
