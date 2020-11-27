@@ -129,6 +129,9 @@ void readFile(std::ifstream& inFile, std::map<std::string, int>& words)
 //  number of times that they appeared.
 //
 // Preconditions :
+//     words must be a valid lvalue map<string, int>
+// Exception Guaruntee :
+//     Strong Guaruntee - data is never modified
 void printResults(const std::map<std::string, int>& words)
 {
     // print distinct word count
@@ -142,6 +145,15 @@ void printResults(const std::map<std::string, int>& words)
 }
 
 
+// main function
+//
+// (Do I need to write all the normal comments for function main? I will just to be safe)
+// Gets a filename from the user, reads the file, and prints some information about it for the user
+//
+// Preconditions : 
+//     none
+// Exception Guaruntee :
+//     Strong guaruntee - all data is internal, file read is never modified
 int main()
 {
     // keys = words used, values = number of times the word has been used
