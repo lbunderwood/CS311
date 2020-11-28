@@ -46,5 +46,33 @@ public:
 };  // End class Squarer
 
 
+/*
+class Squarer {
+public:
+    // operator()
+    // Takes a value k and returns its square.
+    // Requirements on types:
+    //     Num must have binary operator* and copy ctor.
+    // Pre:
+    //     The square of k must be representable as a value of the same
+    //      type as k.
+    // Throws what & when Num operations throw.
+    // Strong Guarantee
+    // Exception Neutral
+    template<typename Num>
+    Num operator()(const Num & k) const
+    {
+        return k * k + 1;
+    }
+
+    // We use automatically generated default ctor & Big 5.
+    Squarer() = default;
+    ~Squarer() = default;
+    Squarer(const Squarer &) = default;
+    Squarer(Squarer &&) = default;
+    Squarer & operator=(const Squarer &) = default;
+    Squarer & operator=(Squarer &&) = default;
+};  // End class Squarer
+*/
 #endif //#ifndef FILE_SQUARER_H_INCLUDED
 
