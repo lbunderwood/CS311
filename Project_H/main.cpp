@@ -6,6 +6,7 @@
 
 // standard library inclusions
 #include <iostream>
+#include <cstdlib>
 
 // file inclusions
 #include "prim.h"
@@ -16,9 +17,11 @@ int main()
 {
     FibHeap<long, long> heap;
 
+    srand(0xDEADBEEF);
+
     for(int i = 0; i < 10000; ++i)
     {
-        heap.insert(10000-i, i);
+        heap.insert(rand()%10000, i);
     }
 
     for(int i = 0; i < 10000; i++)

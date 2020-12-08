@@ -13,7 +13,7 @@
 #include <cstddef>
     // For std::size_t
 #include <cmath>
-    // For log
+    // For log, ciel
 
 // Other File Inclusions
 #include "fibnode.h"
@@ -146,7 +146,7 @@ private:
     void combineTrees()
     {
         // create array to keep track of the number of children each root has
-        std::vector<FibNode<key_type, value_type>*> degrees((int)(log(nodeCount_)/log(2))+1, nullptr);
+        std::vector<FibNode<key_type, value_type>*> degrees((int)ceil(log(nodeCount_ + 1)/log(2)), nullptr);
 
         // use current to cycle through the nodes
         auto current = min_;
