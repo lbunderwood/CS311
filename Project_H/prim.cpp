@@ -29,56 +29,60 @@ std::vector<Edge> prim(const std::vector<std::vector<int>>& adjMtrx,
 
     // this will be the vector<Edge> that is returned,
     // representing the min-weight spanning tree
-    std::vector<Edge> spanTree(N);
+    std::vector<Edge> spanTree;
 
     // this keeps track of which nodes are connected to the spanning tree
     std::vector<int> reachable(N, 0);
+    reachable[startVtx] = 1;
 
     // node most recently added to the spanning tree
     int current = startVtx;
+
+    // number of nodes added to the spanning tree
+    int treeSize = 1;
 
     // when the number of edges in the tree is equal to the number
     // of nodes - 1, we are done
     while(spanTree.size() < N - 1)
     {
         // add edges to nodes adjacent to the one most recently added
-        for(int i = 0; i < N; ++i)
+        for(auto n : adjList[current])
         {
             // only add it if they are connected in the graph and it is not already a part of the tree
-            if(adjMtrx[current][i] != INF && reachable[i] == 0)
+            if(reachable[n] == 0)
             {
                 // add its weight from the adjMtrx and the endpoints to represent the edge
-                edges.insert(adjMtrx[current][i], {current, i});
+                edges.insert(adjMtrx[current][n], {current, n});
             }
         }
 
-        // using this bool seems like poor style, but its the best I could think of
-        bool nothingAdded = true;
-
         // loop until something has been added to the tree
-        while(nothingAdded)
+        while(true)
         {
             // get the edge and the potentially unreachable node
             Edge minEdge = edges.getMin()->getValue();
             int farNode = minEdge.second;
+
+            // at this point, we have all the information we need,
+            // so its time to delete the edge
+            edges.deleteMin();
 
             // check that it hasn't been added a different way
             if(!reachable[farNode])
             {
                 // add it to the tree
                 reachable[farNode] = 1;
-                spanTree[farNode] = minEdge;
+                spanTree.push_back(minEdge);
 
                 // make it the next node to add edges from
                 current = farNode;
 
-                // leave the loop after this iteration
-                nothingAdded = false;
+                // update the count of nodes in the tree
+                ++treeSize;
+
+                // leave the loop
+                break;
             }
-            
-            // at this point, both nodes are definitely in the tree
-            // so it's time to delete the edge
-            edges.deleteMin();
         }
     }
 
