@@ -15,22 +15,14 @@
 
 int main()
 {
-    FibHeap<long, long> heap;
+    // Dummy 5-node fully connected graph
+    auto output = prim(std::vector<std::vector<int>>(5, std::vector<int>(5, 1)), 
+                       std::vector<std::vector<int>>(5, std::vector<int>({0, 1, 2, 3, 4})), 
+                       0);
 
-    srand(0xDEADBEEF);
-
-    for(int i = 0; i < 10000; ++i)
+    for(auto n : output)
     {
-        heap.insert(rand()%10000, i);
-    }
-
-    for(int i = 0; i < 10000; i++)
-    {
-        if(i%10 == 0)
-        {
-            std::cout << heap.getMin()->getKey() << " " << heap.getMin()->getValue() << std::endl;
-        }
-        heap.deleteMin();
+        std::cout << n.first << " " << n.second << std::endl;
     }
 
     return 0;
