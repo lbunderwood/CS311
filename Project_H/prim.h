@@ -14,6 +14,9 @@
     // For std::vector
 
 
+// define number to represent no connection in an adjacency matrix
+const int INF = -1;
+
 // for convenience in referring to edges
 using Edge = std::pair<int, int>;
 
