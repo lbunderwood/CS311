@@ -38,9 +38,6 @@ std::vector<Edge> prim(const std::vector<std::vector<int>>& adjMtrx,
     // node most recently added to the spanning tree
     int current = startVtx;
 
-    // number of nodes added to the spanning tree
-    int treeSize = 1;
-
     // when the number of edges in the tree is equal to the number
     // of nodes - 1, we are done
     while(spanTree.size() < N - 1)
@@ -76,9 +73,6 @@ std::vector<Edge> prim(const std::vector<std::vector<int>>& adjMtrx,
 
                 // make it the next node to add edges from
                 current = farNode;
-
-                // update the count of nodes in the tree
-                ++treeSize;
 
                 // leave the loop
                 break;

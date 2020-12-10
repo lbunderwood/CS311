@@ -73,6 +73,18 @@ private:
         // we only want to do anything if other is not nullptr
         if(other)
         {
+            // reset children of former parent
+            (other->parent_)->childCount_ = 0;
+            (other->parent_)->child_ = nullptr;
+
+            // make sure all new roots no longer have parents
+            auto current = other;
+            do
+            {
+                current->parent_ = nullptr;
+                current = current->next_;
+            }while(current != other);
+
             // holds onto the end of the list being added
             auto placeHolder = other->prev_;
 
@@ -81,22 +93,6 @@ private:
             placeHolder->next_ = min_;
             other->prev_ = min_->prev_;
             min_->prev_ = placeHolder;
-
-            // reset children of former parent
-            (other->parent_)->childCount_ = 0;
-            (other->parent_)->child_ = nullptr;
-
-            // make sure all new roots no longer have parents and set new min
-            auto current = other;
-            do
-            {
-                current->parent_ = nullptr;
-                current = current->next_;
-                if(current->key_ < min_->key_)
-                {
-                    min_ = current;
-                }
-            }while(current != other);
         }
     }
 
