@@ -190,7 +190,7 @@ private:
     void combineTrees()
     {
         // create array to keep track of the number of children each root has
-        std::vector<FibNode<key_type, value_type>*> degrees((int)ceil(log(nodeCount_)/log(2)), nullptr);
+        std::vector<FibNode<key_type, value_type>*> degrees((int)ceil(log(nodeCount_ + 1)/log(2)), nullptr);
 
         // use current to cycle through the nodes
         auto current = min_;
@@ -381,7 +381,7 @@ public:
         }
 
         // a temporary value so we dont lose the rest of the roots
-        auto rootPtr;
+        auto rootPtr = min_;
 
         if(nodeCount_ > 1)
         {
@@ -389,7 +389,7 @@ public:
             merge(min_->child_);
 
             // update our placeholder in case the children of min_ were the only other nodes
-            rootPtr = min->prev_;
+            rootPtr = min_->prev_;
 
             // edit out the old min_ 
             isolate(min_);
@@ -403,11 +403,11 @@ public:
 
         if(nodeCount_ > 0)
         {
-            // consolidate existing trees to make finding the new min_ logarithmic time
-            combineTrees();
-
             // make sure findMin has a good list to look through
             min_ = rootPtr;
+
+            // consolidate existing trees to make finding the new min_ logarithmic time
+            combineTrees();
 
             // change min_ to the new min
             min_ = findMin();
