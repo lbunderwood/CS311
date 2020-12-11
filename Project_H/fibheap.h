@@ -67,7 +67,7 @@ public:
     // Destructor
     ~FibHeap()
     {
-        while(min_)
+        while(min_) // CHANGE THIS - DESTRUCTOR CAN THROW
         {
             deleteMin();
         }
@@ -77,9 +77,18 @@ public:
 // FibHeap : private member functions
 private:
 
-    // merge function
-    // takes a FibNode pointer and adds it and its siblings to the list of roots
-    // must already be a part of the heap, in order to preserve nodeCount
+    // member function merge
+    //
+    // takes a FibNode pointer and adds it and its siblings to the list of roots,
+    // changing their former parent to no longer have children, and updating the
+    // new roots' parent pointers
+    // if other is nullptr, nothing happens
+    //
+    // Preconditions :
+    //      other must already be a part of the heap, in order to preserve nodeCount
+    //
+    // Exception Guaruntee :
+    //      Basig Guaruntee - data is modified throughout
     void merge(FibNode<key_type, value_type>* other)
     {
         // we only want to do anything if other is not nullptr
@@ -108,9 +117,19 @@ private:
         }
     }
 
-    // makeChild function
-    // takes two FibNode pointers and makes the second a child of the first
-    // both must already be a part of the heap, in order to preserve nodeCount
+    // member function makeChild
+    //
+    // takes two FibNode pointers and makes the second a child of the first, making it either
+    // the child pointed to by parent->child_, if parent did not previously have children,
+    // or inserting it between parent->child_ and parent->child_->next_ if it did have children.
+    // child's parent pointer and parent's childCount_ are updated accordingly
+    // if either parent or child is nullptr, nothing happens
+    //
+    // Preconditions :
+    //      both parent and child must already be a part of the heap, in order to preserve nodeCount
+    //
+    // Exception Guaruntee :
+    //      Basic Guaruntee - data is modified throughout
     void makeChild(FibNode<key_type, value_type>* parent, FibNode<key_type, value_type>* child)
     {
         // we only want to do anything if both are not nullptr
@@ -136,8 +155,18 @@ private:
         }
     }
 
-    // isolate function
-    // takes a node pointer and removes it from its sibling list
+    // member function isolate
+    //
+    // takes a node pointer and removes it from its sibling list, pointing it's prev_ and next_
+    // pointers to itself, and it's former neighbors to each other.
+    // node will keep any children.
+    //
+    // Precontions :
+    //      node must be a member of the root list, since its parent pointer is not modified
+    //      (the only cases in which we need such a function, this happens to be the case anyway)
+    //
+    // Exception Guaruntee :
+    //      Basic Guaruntee - data is modified throughout
     void isolate(FibNode<key_type, value_type>* node)
     {
         // edit it out of its sibling list
@@ -149,8 +178,15 @@ private:
         node->next_ = node;
     }
 
-    // combineTrees function
+    // member function combineTrees
     //
+    // goes through the current root list, combining any roots that have the same degree until
+    // they all have different numbers of children.
+    // 
+    // Preconditions :
+    //      none
+    // Exception Guaruntee :
+    //      Basic Guaruntee - data is modified throughout
     void combineTrees()
     {
         // create array to keep track of the number of children each root has
@@ -239,8 +275,14 @@ private:
         }while(current != min_);
     }
 
-    // findMin function
+    // member function findMin
     // 
+    // goes through the current list of roots and returns the one with the smallest key
+    //
+    // Preconditions :
+    //      none
+    // Exception Guaruntee :
+    //      Strong Guaruntee - no data is modified
     FibNode<key_type, value_type>* findMin()
     {
         // use smallest to keep track of the min found
@@ -268,15 +310,29 @@ private:
 // FibHeap : public member functions
 public:
 
-    // getMin function
-    // 
+    // member function getMin
+    // returns a pointer to node with the smallest key
+    // Preconditions : 
+    //      none
+    // Exception Guaruntee :
+    //      Strong Guaruntee - no data modified
     FibNode<key_type, value_type>* getMin() const
     {
         return min_;
     }
 
-    // insert function
+    // member function insert
     // 
+    // Takes a key and value, inserts a node with that key and value into the heap
+    // New nodes are created using new, and aresimply added as roots, between min_ and min_->next
+    // nodeCount is increased by 1
+    //
+    // Preconditions : 
+    //      key and value must be valid objects of the correct types
+    //
+    // Exception Guaruntee :
+    //      Basic Guaurntee - data are modified throughout
+    //          key and data are never modified, only internal data of fibHeap
     void insert(const key_type& key, const value_type& value)
     {
         // create a new node
@@ -307,8 +363,15 @@ public:
         
     }
 
-    // deleteMin function
+    // member function deleteMin
     // 
+    // deletes the minimum node, combines roots into trees of differing degrees
+    // to make finding the new min logarithmic-time, and then finds and sets the new min
+    //
+    // Preconditions :
+    //      none
+    // Exception Guaruntee :
+    //      Basic Guaruntee - data are modified throughout
     void deleteMin()
     {
         // if there are no more nodes, we don't want to double-delete

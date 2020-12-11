@@ -56,32 +56,57 @@ public:
 // FibNode : constructors and destructor
 public:
 
-    // Default Constructor
+    // Default Constructor - should not be used
     FibNode() = delete;
 
+
     // Two-Parameter Constructor
+    //
+    // takes key and value, assigning them to key_ and value_,
+    // sets childCount to 0, since there are not yet any children,
+    // sets prev_ and next_ to this, and parent_ and child_ to nullptr, 
+    // as required by invariants since there are not yet any related nodes
+    //
+    // Preconditions :
+    //      key and value must be valid objects of the types given in template declaration
+    //
+    // Exception Guaruntee :
+    //      Strong Guaruntee - data are not modified, merely copied
     FibNode(const key_type& key, const value_type& value) 
-        : key_(key), value_(value), marked_(false), childCount_(0),
+        : key_(key), value_(value), childCount_(0),
           next_(this), prev_(this), parent_(nullptr), child_(nullptr) {}
 
-    // Move and Copy Constructors and Assignment Operators
+
+    // Move and Copy Constructors and Assignment Operators - should not be used
     FibNode(const FibNode& other) = delete;
     FibNode operator=(const FibNode& other) = delete;
     FibNode(FibNode&& other) = delete;
     FibNode operator=(FibNode && other) = delete;
 
-    // Destructor
+    // Destructor - writen automatically, nothing special to do
     ~FibNode() = default;
 
 
-// FibNode : friend declaration
+// FibNode : public member functions
 public:
 
+    // member function getKey
+    // returns the key
+    // Preconditions : 
+    //      none
+    // Exception Guaruntee : 
+    //      Strong Guraruntee - function is const so data cannot be modified
     key_type getKey() const
     {
         return key_;
     }
 
+    // member function getValue
+    // returns the value
+    // Preconditions : 
+    //      none
+    // Exception Guaruntee : 
+    //      Strong Guraruntee - function is const so data cannot be modified
     value_type getValue() const
     {
         return value_;
