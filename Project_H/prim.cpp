@@ -15,7 +15,14 @@
 #include <utility>
     // For std::pair
 
-// ADD COMMENTS HERE
+// function prim
+//
+// provided with an adjacency matrix, adjacency list, and starting vertex,
+// runs prim's algorithm on a graph and returns std::vector<Edge> that makes up
+// the minimum weight spanning tree. Edge is defined in prim.h as std::pair<int, int>,
+// where the integers are the vertices that the edge connects.
+//
+// See header prim.h for full documentation
 std::vector<Edge> prim(const std::vector<std::vector<int>>& adjMtrx,
                        const std::vector<std::vector<int>>& adjList,
                        int startVtx)

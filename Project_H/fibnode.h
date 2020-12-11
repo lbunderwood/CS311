@@ -8,11 +8,6 @@
 #ifndef FIBNODE_H
 #define FIBNODE_H
 
-// Standard Library Inclusions
-#include <utility>
-    // For std::pair
-#include <memory>
-    // For std::unique_ptr, std::make_unique
 #include <cstddef>
     // For std::size_t
 
@@ -20,11 +15,21 @@
 template<typename K, typename V>
 class FibHeap;
 
-// comments
-// comments
-// comments comments comments
-// comments comments comments comments
-// comments comments comments comments
+// class FibNode
+// 
+// Node class for being used in Fibonacci Heap defined in fibheap.h
+// Stores a key, value, count of how many children this node has, and pointers
+// to siblings in a doubly-linked circular list, as well as this node's parent and 
+// one of its children, as the rest can be accessed via the sibling list.
+//
+// Class Invariants :
+//      If the node has no siblings, both prev_ and next_ must point to this node
+//      If the node has no children, child_ must be nullptr
+//      If the node has no parent (it is a root), parent_ must be nullptr
+//      childCount_ must be updated whenever the child list is modified
+//
+// Template Type Requirements :
+//      K and V must have copy constructors - required by 2-parameter constructor
 template<typename K, typename V>
 class FibNode
 {
@@ -48,7 +53,7 @@ public:
     friend FibHeap<key_type, value_type>;
 
 
-// FibNode : friend declaration
+// FibNode : constructors and destructor
 public:
 
     // Default Constructor
@@ -72,12 +77,12 @@ public:
 // FibNode : friend declaration
 public:
 
-    key_type getKey()
+    key_type getKey() const
     {
         return key_;
     }
 
-    value_type getValue()
+    value_type getValue() const
     {
         return value_;
     }
@@ -92,9 +97,6 @@ private:
 
     // data stored in this node
     value_type value_;
-
-    // COMMENT HERE
-    bool marked_;
 
     // keeps track of the number of children this node has
     size_type childCount_;

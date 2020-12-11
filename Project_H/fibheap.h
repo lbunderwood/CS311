@@ -19,11 +19,23 @@
 #include "fibnode.h"
 
 
-// comments
-// comments
-// comments comments comments
-// comments comments comments comments
-// comments comments comments comments
+// class FibHeap
+//
+// Manages a fibonacci heap of fibNodes, defined in fibnode.h, with a public interface
+// that only allows the client to insert nodes, view the minimum node, and delete the minimum node.
+// Other functionality that is often given to fibonacci heaps has been omitted, since the sole
+// purpose of this implementation is to serve an implementation of prim's which does not require
+// any further functionality. (see prim.h & prim.cpp)
+//
+// Class Invariants :
+//      The key of a child node must always be >= the key of the parent
+//      min_ must always point to the minimum-key node, except briefly during insert and deleteMin
+//      After performing deleteMin, there must not be any two roots (siblings of min_) with the same
+//        degree (number of children), leaving a number of roots logarithmic to the number of nodes.
+// 
+// Template Type Requirements :
+//      K and V must have copy constructors - required by insert
+//      K must have operator<
 template<typename K, typename V>
 class FibHeap
 {
@@ -258,7 +270,7 @@ public:
 
     // getMin function
     // 
-    FibNode<key_type, value_type>* getMin()
+    FibNode<key_type, value_type>* getMin() const
     {
         return min_;
     }
@@ -338,21 +350,13 @@ public:
         --nodeCount_;
     }
 
-    // decreaseKey function
-    //
-    void decreaseKey();
-
-    // erase function
-    //
-    void erase(const key_type& key);
-
 // FibHeap : member variables
 private:
 
     // always points to the minimum-key node
     FibNode<key_type, value_type>* min_;
 
-    // keeps track of the number of roots (siblings of min_, including min_)
+    // keeps track of the total number of nodes
     size_type nodeCount_;
 
 };
