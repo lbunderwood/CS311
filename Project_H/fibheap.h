@@ -184,13 +184,13 @@ private:
     // they all have different numbers of children.
     // 
     // Preconditions :
-    //      none
+    //      nodeCount_ > 0
     // Exception Guaruntee :
     //      Basic Guaruntee - data is modified throughout
     void combineTrees()
     {
         // create array to keep track of the number of children each root has
-        std::vector<FibNode<key_type, value_type>*> degrees((int)ceil(log(nodeCount_ + 1)/log(2)), nullptr);
+        std::vector<FibNode<key_type, value_type>*> degrees((int)ceil(log(nodeCount_)/log(2)), nullptr);
 
         // use current to cycle through the nodes
         auto current = min_;
@@ -358,7 +358,7 @@ public:
             min_ = node;
         }
 
-        // increase the number of roots
+        // increase the number of nodes
         ++nodeCount_;
         
     }
@@ -380,37 +380,44 @@ public:
             return;
         }
 
-        // make any children of min_ into roots
-        merge(min_->child_);
-
         // a temporary value so we dont lose the rest of the roots
-        auto newMin = min_->prev_;
+        auto rootPtr;
 
-        // edit out the old min_ 
-        isolate(min_);
+        if(nodeCount_ > 1)
+        {
+            // make any children of min_ into roots
+            merge(min_->child_);
+
+            // update our placeholder in case the children of min_ were the only other nodes
+            rootPtr = min->prev_;
+
+            // edit out the old min_ 
+            isolate(min_);
+        }
 
         // delete the old min_
         delete min_;
 
-        min_ = newMin;
+        // decrement nodeCount_
+        --nodeCount_;
 
-        // consolidate existing trees to make finding the new min_ logarithmic time
-        combineTrees();
+        if(nodeCount_ > 0)
+        {
+            // consolidate existing trees to make finding the new min_ logarithmic time
+            combineTrees();
 
-        // if we just deleted the last node, we want to make sure its obvious
-        // that there are no more nodes
-        if(nodeCount_ <= 1)
-        {
-            min_ = nullptr;
-        }
-        // otherwise, proceed as usual
-        else
-        {
+            // make sure findMin has a good list to look through
+            min_ = rootPtr;
+
             // change min_ to the new min
             min_ = findMin();
         }
-
-        --nodeCount_;
+        // if we just deleted the last node, we want to make sure its obvious
+        // that there are no more nodes
+        else
+        {
+            min_ = nullptr;
+        }
     }
 
 // FibHeap : member variables
